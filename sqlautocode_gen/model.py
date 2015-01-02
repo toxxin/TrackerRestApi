@@ -438,6 +438,8 @@ class TrPlace(DeclarativeBase):
     longitude = Column(u'longitude', DECIMAL(precision=11, scale=8))
     latitude = Column(u'latitude', DECIMAL(precision=10, scale=8))
     type = Column(u'type', String(30), nullable=False)
+    last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
+    creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
     user_id = Column(u'user_id', Integer, ForeignKey('b_user.ID'), nullable=False)
 
     def __init__(self, user_id, title, longitude, latitude, type, desc=None):
