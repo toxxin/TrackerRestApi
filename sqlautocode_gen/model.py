@@ -84,6 +84,8 @@ class TrUser(DeclarativeBase):
 
     feeds = relationship("TrFeed", secondary=association_table_user_feed)
 
+    places = relationship("TrPlace", foreign_keys="TrPlace.user_id", cascade="all,delete")
+
     def is_authenticated(self):
         return True
 
@@ -423,6 +425,28 @@ class TrRoadNews(DeclarativeBase):
         self.pic = pic
         self.tag = tag
 
+
+class TrPlace(DeclarativeBase):
+    __tablename__ = 'tr_place'
+
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
+    #colomn definition
+    id = Column(u'id', Integer, primary_key=True)
+    title = Column(u'title', String(255), nullable=False)
+    desc = Column(u'desc', UnicodeText)
+    longitude = Column(u'longitude', DECIMAL(precision=11, scale=8))
+    latitude = Column(u'latitude', DECIMAL(precision=10, scale=8))
+    type = Column(u'type', String(30), nullable=False)
+    user_id = Column(u'user_id', Integer, ForeignKey('b_user.ID'), nullable=False)
+
+    def __init__(self, user_id, title, longitude, latitude, type, desc=None):
+        self.title = title
+        self.longitude = longitude
+        self.latitude = latitude
+        self.type = type
+        self.desc = desc
+        self.user_id = user_id
 
 # try:
 #     TrPushToken.__table__.drop(engine)
