@@ -59,15 +59,16 @@ def addPlace(user_id, title, longitude, latitude, type, desc):
     try:
         session.add(p)
         session.commit()
+        session.flush()
+        session.commit()
+        session.refresh(p)
     except:
         session.rollback()
         raise ServerError("Can't add place.")
     finally:
         session.close()
 
-    session.close()
-
-    return True
+    return p.id
 
 
 @jsonrpc.method('delPlace(user_id=Number, place_id=Number) -> Object', validate=True, authenticated=False)
