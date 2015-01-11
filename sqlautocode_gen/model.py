@@ -105,6 +105,22 @@ class TrUser(DeclarativeBase):
         self.PASSWORD = password
 
 
+class TrUser(DeclarativeBase):
+    __tablename__ = 'tr_user'
+
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
+    #column definitions
+    id = Column(u'id', INTEGER(), primary_key=True, nullable=False)
+    active = Column(u'active', CHAR(length=1, collation=u'utf8_unicode_ci'), nullable=False)
+    login = Column(u'login', VARCHAR(length=50, collation=u'utf8_unicode_ci'), nullable=False)
+    auth_code = Column(u'auth_code', CHAR(length=4), nullable=False)
+    last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
+    creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
+    token = Column(u'token', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
+    session = Column(u'session', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
+
+
 class TrVehicle(DeclarativeBase):
     __tablename__ = 'tr_vehicle'
 
