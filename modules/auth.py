@@ -1,87 +1,196 @@
 # -*- coding: utf-8 -*-
+
 __author__ = 'Anton Glukhov'
 __copyright__ = "Copyright 2014, Easywhere"
 __email__ = "ag@easywhere.ru"
 
 import random
 import string
+import urllib2, urllib
+import time
+import xml.etree.ElementTree as ET
+
+from flask.ext.jsonrpc import ServerError
+from flask.ext.login import login_user, login_required
+from sqlautocode_gen.model import TrUserTest
+
 from TrackerRestApi import jsonrpc, app
 from TrackerRestApi import Session
-
-
-CODE_LEN = 4
 
 
 @jsonrpc.method('getCode(number=String) -> Any', validate=True, authenticated=False)
 def getCode(number):
 
+    session = Session()
+
+    sms = SmsEpochta()
+    code = ''.join(random.choice(string.digits) for _ in range(app.config.get('SMS_CODE_LEN')))
+
+    u = session.query(TrUserTest).filter(TrUserTest.login == number).first()
+
+    if u is None:
+        u = TrUserTest(login=number, auth_code=code, active='N')
+        try:
+            session.add(u)
+            session.commit()
+            session.flush()
+            session.commit()
+            session.refresh(u)
+        except:
+            session.rollback()
+            raise ServerError("Can't add new user.")
+        finally:
+            session.close()
+
+    else:
+        setattr(u, 'auth_code', code)
+        setattr(u, 'active', 'N')
+
+        try:
+            session.merge(u)
+            session.commit()
+            session.flush()
+            session.commit()
+            session.refresh(u)
+        except:
+            session.rollback()
+            raise ServerError("Can't generate new code.")
+        finally:
+            session.close()
+
+    sms.send(number, code)
+
+    return u.id
+
+
+@jsonrpc.method('getToken(id=Number, code=String) -> Object', validate=True, authenticated=False)
+def getToken(id, code):
+
+    session = Session()
+
+    u = session.query(TrUserTest).filter(TrUserTest.id == id).first()
+
+    if u is None:
+        session.close()
+        raise ServerError("User doesn't exist.")
+
+    #TODO:: expired date of code
+
+    if u.auth_code == code:
+        login_user(u)
+
+    session.close()
+
+    return True
+
+
+class SmsProvider(object):
+
     login = ""
     password = ""
 
-    phone_sms = ""
-    msg_id = ""
+    def __init__(self, login, password):
+        self.login = login
+        self.password = password
 
-    send_sms = '''<?xml version="1.0" encoding="UTF-8"?>
-    <SMS>
-    <operations>
-    <operation>SEND</operation>
-    </operations>
-    <authentification>
-    <username>%s</username>
-    <password>%s</password>
-    </authentification>
-    <message>
-    <sender>SMS</sender>
-    <text>3305</text>
-    </message>
-    <numbers>
-    <number messageID=""></number>
-    </numbers>
-    </SMS>''' % (login, password)
-    # ''.join(random.choice(string.digits) for _ in range(CODE_LEN))
-    import urllib2, urllib
-    senddata=[('XML',send_sms)]
-    senddata=urllib.urlencode(senddata)
-    path='http://atompark.com/members/sms/xml.php'
-    req=urllib2.Request(path, senddata)
-    req.add_header("Content-type", "application/x-www-form-urlencoded")
-    result=urllib2.urlopen(req).read()
-    print result
+    def send(self, number, message):
+        raise NotImplementedError('Method send() is pure virtual')
 
-    return True
+    def status(self, mes_id):
+        raise NotImplementedError('Method status() is pure virtual')
 
-# @jsonrpc.method('getToken(number=Number, code=Code) -> Any', validate=True, authenticated=False)
-# def getToken(number, code):
-#     pass
+    def balance(self):
+        raise NotImplementedError('Method balance() is pure virtual')
 
 
-@jsonrpc.method('getBalance(number=String) -> Any', validate=True, authenticated=False)
-def getBalance(number):
+class SmsEpochta(SmsProvider):
 
-    login = ""
-    password = ""
+    def __init__(self, login=app.config.get('SMS_LOGIN'), password=app.config.get('SMS_PASS')):
+        super(SmsEpochta, self).__init__(login, password)
 
-    phone_sms = ""
-    msg_id = ""
+    def send(self, number, message):
 
-    get_balance = '''<?xml version="1.0" encoding="UTF-8"?>
-    <SMS>
-    <operations>
-    <operation>BALANCE</operation>
-    </operations>
-    <authentification>
-    <username>%s</username>
-    <password>%s</password>
-    </authentification>
-    </SMS>''' % (login, password)
+        mes_id = "123456"
 
-    import urllib2, urllib
-    senddata=[('XML',get_balance)]
-    senddata=urllib.urlencode(senddata)
-    path='http://my.atompark.com/sms/xml.php'
-    req=urllib2.Request(path, senddata)
-    req.add_header("Content-type", "application/x-www-form-urlencoded")
-    result=urllib2.urlopen(req).read()
-    print result
+        send_sms = '''<?xml version="1.0" encoding="UTF-8"?>
+        <SMS>
+        <operations>
+        <operation>SEND</operation>
+        </operations>
+        <authentification>
+        <username>%s</username>
+        <password>%s</password>
+        </authentification>
+        <message>
+        <sender>SMS</sender>
+        <text>%s</text>
+        </message>
+        <numbers>
+        <number messageID="%s">%s</number>
+        </numbers>
+        </SMS>''' % (self.login, self.password, message, mes_id, number)
 
-    return True
+        senddata=[('XML',send_sms)]
+        senddata=urllib.urlencode(senddata)
+        path='http://atompark.com/members/sms/xml.php'
+        req=urllib2.Request(path, senddata)
+        req.add_header("Content-type", "application/x-www-form-urlencoded")
+        result=urllib2.urlopen(req).read()
+
+        root = ET.fromstring(result)
+        r = {c.tag: c.text for c in root}
+
+        app.logger.debug('sms: send: %s' % r)
+
+    def get_status(self, mes_id):
+
+        get_sms_status = '''<?xml version="1.0" encoding="UTF-8"?>
+        <SMS>
+        <operations>
+        <operation>GETSTATUS</operation>
+        </operations>
+        <authentification>
+        <username>%s</username>
+        <password>%s</password>
+        </authentification>
+        <statistics>
+        <messageid>%s</messageid>
+        </statistics>
+        </SMS>''' % (self.login, self.password, mes_id)
+
+        senddata=[('XML',get_sms_status)]
+        senddata=urllib.urlencode(senddata)
+        path='http://my.atompark.com/sms/xml.php'
+        req=urllib2.Request(path, senddata)
+        req.add_header("Content-type", "application/x-www-form-urlencoded")
+        result=urllib2.urlopen(req).read()
+
+        root = ET.fromstring(result)
+        r = {c.tag: c.text for c in root}
+
+        app.logger.debug('sms: status: %s' % r)
+
+    def balance(self):
+
+        get_balance = '''<?xml version="1.0" encoding="UTF-8"?>
+        <SMS>
+        <operations>
+        <operation>BALANCE</operation>
+        </operations>
+        <authentification>
+        <username>%s</username>
+        <password>%s</password>
+        </authentification>
+        </SMS>''' % (self.login, self.password)
+
+        senddata=[('XML',get_balance)]
+        senddata=urllib.urlencode(senddata)
+        path='http://my.atompark.com/sms/xml.php'
+        req=urllib2.Request(path, senddata)
+        req.add_header("Content-type", "application/x-www-form-urlencoded")
+        result=urllib2.urlopen(req).read()
+
+        root = ET.fromstring(result)
+        r = {c.tag: c.text for c in root}
+
+        app.logger.debug('sms: balance: %s' % r)
