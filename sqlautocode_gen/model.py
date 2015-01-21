@@ -105,7 +105,7 @@ class TrUser(DeclarativeBase):
         self.PASSWORD = password
 
 
-class TrUser(DeclarativeBase):
+class TrUserTest(DeclarativeBase):
     __tablename__ = 'tr_user'
 
     __table_args__ = {'mysql_engine': 'InnoDB'}
@@ -120,6 +120,24 @@ class TrUser(DeclarativeBase):
     token = Column(u'token', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
     session = Column(u'session', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
 
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return unicode(self.id)
+
+    def __init__(self, login, auth_code, active='Y', token=None, session=None):
+        self.login = login
+        self.auth_code = auth_code
+        self.active = active
+        self.token = token
+        self.session = session
 
 class TrVehicle(DeclarativeBase):
     __tablename__ = 'tr_vehicle'
