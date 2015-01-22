@@ -1,6 +1,9 @@
 __author__ = 'Anton Glukhov'
+__copyright__ = "Copyright 2014, Easywhere"
+__email__ = "ag@easywhere.ru"
 
 import datetime
+from flask.ext.login import make_secure_token
 from sqlalchemy import *
 from sqlalchemy.orm import relationship
 from sqlautocode_gen import DeclarativeBase
@@ -113,6 +116,7 @@ class TrUserTest(DeclarativeBase):
     #column definitions
     id = Column(u'id', INTEGER(), primary_key=True, nullable=False)
     active = Column(u'active', CHAR(length=1, collation=u'utf8_unicode_ci'), nullable=False)
+    authenticated = Column(u'authenticated', Boolean, nullable=False)
     login = Column(u'login', VARCHAR(length=50, collation=u'utf8_unicode_ci'), nullable=False)
     auth_code = Column(u'auth_code', CHAR(length=4), nullable=False)
     last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
@@ -121,10 +125,10 @@ class TrUserTest(DeclarativeBase):
     session = Column(u'session', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
 
     def is_authenticated(self):
-        return True
+        return self.authenticated
 
     def is_active(self):
-        return True
+        return True if self.active == 'Y' else False
 
     def is_anonymous(self):
         return False
@@ -132,12 +136,16 @@ class TrUserTest(DeclarativeBase):
     def get_id(self):
         return unicode(self.id)
 
-    def __init__(self, login, auth_code, active='Y', token=None, session=None):
+    def get_auth_token(self):
+        return make_secure_token("123456")
+
+    def __init__(self, login, auth_code, active='Y', authenticated=False, token=None, session=None):
         self.login = login
         self.auth_code = auth_code
         self.active = active
         self.token = token
         self.session = session
+
 
 class TrVehicle(DeclarativeBase):
     __tablename__ = 'tr_vehicle'
