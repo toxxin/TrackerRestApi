@@ -11,7 +11,7 @@ import datetime
 import xml.etree.ElementTree as ET
 
 from flask.ext.jsonrpc import ServerError
-from flask.ext.login import login_user, login_required, logout_user
+from flask.ext.login import login_user, login_required, logout_user, current_user
 from sqlautocode_gen.model import TrUserTest
 
 from TrackerRestApi import jsonrpc, app
@@ -63,23 +63,26 @@ def getCode(number):
     return u.id
 
 
-@jsonrpc.method('getToken(id=Number, code=String) -> Object', validate=True, authenticated=False)
-def getToken(id, code):
+@jsonrpc.method('login(id=Number, code=String) -> Object', validate=True, authenticated=False)
+def login(id, code):
 
-    session = Session()
+    s = Session()
 
-    u = session.query(TrUserTest).filter(TrUserTest.id == id).first()
+    u = s.query(TrUserTest).filter(TrUserTest.id == id).first()
 
     if u is None:
-        session.close()
+        s.close()
         raise ServerError("User doesn't exist.")
 
     #TODO:: expired date of code
 
     if u.auth_code == code:
+        u.authenticated = True
+        s.merge(u)
+        s.commit()
         login_user(u)
 
-    session.close()
+    s.close()
 
     return True
 
@@ -87,6 +90,12 @@ def getToken(id, code):
 @jsonrpc.method('logout() -> Any', validate=True, authenticated=False)
 @login_required
 def logout():
+    s = Session()
+    u = current_user
+    u.authenticated = False
+    s.merge(u)
+    s.commit()
+    s.close()
     logout_user()
     return True
 

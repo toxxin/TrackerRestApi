@@ -1,5 +1,8 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
+
 __author__ = 'Anton Glukhov'
+__copyright__ = "Copyright 2014, Easywhere"
+__email__ = "ag@easywhere.ru"
 
 from flask.ext.login import login_required, login_user
 
