@@ -7,11 +7,11 @@ __email__ = "ag@easywhere.ru"
 import random
 import string
 import urllib2, urllib
-import time
+import datetime
 import xml.etree.ElementTree as ET
 
 from flask.ext.jsonrpc import ServerError
-from flask.ext.login import login_user, login_required
+from flask.ext.login import login_user, login_required, logout_user
 from sqlautocode_gen.model import TrUserTest
 
 from TrackerRestApi import jsonrpc, app
@@ -81,6 +81,13 @@ def getToken(id, code):
 
     session.close()
 
+    return True
+
+
+@jsonrpc.method('logout() -> Any', validate=True, authenticated=False)
+@login_required
+def logout():
+    logout_user()
     return True
 
 
@@ -194,3 +201,43 @@ class SmsEpochta(SmsProvider):
         r = {c.tag: c.text for c in root}
 
         app.logger.debug('sms: balance: %s' % r)
+
+    # def get_price(self):
+    #
+    #     get_send_price = '''<?xml version="1.0" encoding="UTF-8"?>
+    #     <SMS>
+    #     <operations>
+    #     <operation>GETPRICE</operation>
+    #     </operations>
+    #     <authentification>
+    #     <username>%s</username>
+    #     <password>%s</password>
+    #     </authentification>
+    #     <message>
+    #     <sender>SMS</sender>
+    #     <text>Test message [UTF-8]</text>
+    #     </message>
+    #     <numbers>
+    #     <number messageID="%s">%s</number>
+    #     </numbers>
+    #     </SMS>''' % (self.login, self.password, phone_sms, msg_id)
+    #
+    #     senddata=[('XML',get_send_price)]
+    #     senddata=urllib.urlencode(senddata)
+    #     path='http://my.atompark.com/sms/xml.php'
+    #     req=urllib2.Request(path, senddata)
+    #     req.add_header("Content-type", "application/x-www-form-urlencoded")
+    #     result=urllib2.urlopen(req).read()
+    #     print result
+
+
+@app.route('/test', methods=['POST', 'GET'])
+@login_required
+def test():
+    return 'Test'
+
+
+@jsonrpc.method('testSession(id=Number) -> Any', validate=True, authenticated=False)
+@login_required
+def testSession(id):
+    return True
