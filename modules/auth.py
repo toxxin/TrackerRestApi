@@ -30,33 +30,20 @@ def getCode(number):
 
     if u is None:
         u = TrUserTest(login=number, auth_code=code, active='N')
-        try:
-            session.add(u)
-            session.commit()
-            session.flush()
-            session.commit()
-            session.refresh(u)
-        except:
-            session.rollback()
-            raise ServerError("Can't add new user.")
-        finally:
-            session.close()
-
+        session.add(u)
     else:
         setattr(u, 'auth_code', code)
         setattr(u, 'active', 'N')
+        session.merge(u)
 
-        try:
-            session.merge(u)
-            session.commit()
-            session.flush()
-            session.commit()
-            session.refresh(u)
-        except:
-            session.rollback()
-            raise ServerError("Can't generate new code.")
-        finally:
-            session.close()
+    try:
+        session.commit()
+        session.refresh(u)
+    except:
+        session.rollback()
+        raise ServerError("Can't generate new code.")
+    finally:
+        session.close()
 
     sms.send(number, code)
 
@@ -75,6 +62,11 @@ def login(id, code):
         raise ServerError("User doesn't exist.")
 
     #TODO:: expired date of code
+    exp = int((datetime.datetime.now() - u.last_modified).total_seconds())
+    print exp
+    if exp > app.config['SMS_CODE_LIFETIME']:
+        s.close()
+        raise ServerError("Invalid code.")
 
     if u.auth_code == code:
         u.authenticated = True
