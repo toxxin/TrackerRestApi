@@ -9,7 +9,6 @@ from TrackerRestApi import Session
 from flask_jsonrpc import ServerError
 from sqlautocode_gen.model import *
 from sqlautocode_gen.dealers_model import *
-from sqlautocode_gen.tbl_02_models import *
 
 from tools.pygeotools import GeoLocation
 
