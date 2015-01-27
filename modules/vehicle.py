@@ -4,7 +4,7 @@ __author__ = 'Anton Glukhov'
 __copyright__ = "Copyright 2014, Easywhere"
 __email__ = "ag@easywhere.ru"
 
-from flask.ext.login import login_required, login_user
+from flask.ext.login import login_required, login_user, current_user
 
 import os
 
@@ -134,7 +134,8 @@ def fillTechVehicle(v):
             "tire_diameter_rear": v.car_model.tire_diameter_rear,
             "tire_height_front": v.car_model.tire_height_front,
             "tire_height_rear": v.car_model.tire_height_rear,
-            "tire_width_front": v.car_model.tire_width_front,
+            # "tire_width_front": v.car_model.tire_width_front,
+            "tire_width_front": v.car_model.tire_width_rear,
             "tire_width_rear": v.car_model.tire_width_rear
         }
     }
@@ -143,13 +144,14 @@ def fillTechVehicle(v):
 
 
 @jsonrpc.method('getVehicles(user_id=Number) -> Any', validate=True, authenticated=False)
+@login_required
 def getVehicles(user_id):
 
     session = Session()
 
     lst = []
 
-    vehiles = session.query(TrVehicle).filter(TrVehicle.user_id == user_id).all()
+    vehiles = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).all()
 
     for v in vehiles:
         lst.append(fillVihecleResponse(v))
@@ -160,11 +162,12 @@ def getVehicles(user_id):
 
 
 @jsonrpc.method('getVehicleTech(user_id=Number, id=Number) -> Object', validate=True, authenticated=False)
+@login_required
 def getVehicleTech(user_id, id):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == user_id).filter(TrVehicle.id == id).first()
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
 
     if v is None:
         raise ServerError("Vehicle doesn't exist.")
@@ -177,6 +180,7 @@ def getVehicleTech(user_id, id):
 
 
 @jsonrpc.method('addVehicle(user_id=Number, name=String, type=String, maker=String, model=String, generation=String, modification=String, year=Number) -> Object', validate=True, authenticated=False)
+@login_required
 def addVehicle(user_id, name, type, maker, model, generation, modification, year):
 
     session = Session()
@@ -192,7 +196,7 @@ def addVehicle(user_id, name, type, maker, model, generation, modification, year
     if type != 'A' and type != 'M':
         raise ServerError("Incorrect vehicle type.")
 
-    v = TrVehicle(user_id=user_id, name=name, type=type, car_model_id=car.id, year=year)
+    v = TrVehicle(user_id=int(current_user.get_id()), name=name, type=type, car_model_id=car.id, year=year)
 
     try:
         session.add(v)
@@ -210,11 +214,12 @@ def addVehicle(user_id, name, type, maker, model, generation, modification, year
 
 
 @jsonrpc.method('updateVehicle(user_id=Number, id=Number, name=String, maker=String, model=String, generation=String, modification=String, year=Number) -> Object', validate=True, authenticated=False)
+@login_required
 def updateVehicle(user_id, id, name, maker, model, generation, modification, year):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == user_id).filter(TrVehicle.id == id).first()
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
 
     if v is None:
         session.close()
@@ -307,11 +312,12 @@ def delSTS(user_id, id):
 
 
 @jsonrpc.method('delVehicle(user_id=Number, id=Number) -> Object', validate=True, authenticated=False)
+@login_required
 def delVehicle(user_id, id):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == user_id).filter(TrVehicle.id == id).first()
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
 
     if v is None:
         session.close()
