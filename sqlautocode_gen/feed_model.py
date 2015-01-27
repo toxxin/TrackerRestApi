@@ -1,4 +1,7 @@
 __author__ = 'Anton Glukhov'
+__copyright__ = "Copyright 2014, Easywhere"
+__email__ = "ag@easywhere.ru"
+
 
 from sqlalchemy import *
 from sqlalchemy.orm import relationship
@@ -7,7 +10,7 @@ from sqlautocode_gen import DeclarativeBase
 
 association_table_user_feed = Table('tr_user_feed', DeclarativeBase.metadata,
     Column(u'id', Integer, primary_key=True),
-    Column(u'user_id', Integer, ForeignKey('b_user.ID'), nullable=False),
+    Column(u'user_id', Integer, ForeignKey('tr_user.id'), nullable=False),
     Column(u'feed_id', Integer, ForeignKey('tr_feed.id'), nullable=False)
     )
 
@@ -81,7 +84,7 @@ class TrFavFeedTest(DeclarativeBase):
     __table_args__ = {'mysql_engine': 'InnoDB'}
 
     #colomn definition
-    u_id = Column(u'u_id', Integer, ForeignKey('b_user.ID', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
+    u_id = Column(u'u_id', Integer, ForeignKey('tr_user.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
     f_id = Column(u'f_id', Integer, ForeignKey('tr_feed.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
     p_id = Column(u'p_id', Integer, ForeignKey('tr_feed_news.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
     creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
