@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
 __author__ = 'Anton Glukhov'
+__copyright__ = "Copyright 2014, Easywhere"
+__email__ = "ag@easywhere.ru"
 
-
-from flask.ext.login import login_required, login_user
+from flask.ext.login import login_required, current_user
 
 from TrackerRestApi import jsonrpc, app
 from TrackerRestApi import Session
@@ -38,6 +41,7 @@ def fillDealerResponse(dl):
 
 
 @jsonrpc.method('getAllDealers(user_id=Number) -> Any', validate=True, authenticated=False)
+@login_required
 def getAllDealers(user_id):
 
     session = Session()
@@ -63,11 +67,12 @@ def f7(seq):
 
 
 @jsonrpc.method('getDealers(user_id=Number, vehicle_id=Number, location=String, radius=Number) -> Object', validate=True, authenticated=False)
+@login_required
 def getDealers(user_id, vehicle_id, location, radius):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == user_id).\
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).\
         filter(TrVehicle.id == vehicle_id).first()
 
     if v is None:
