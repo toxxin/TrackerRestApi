@@ -4,7 +4,7 @@ __author__ = 'Anton Glukhov'
 __copyright__ = "Copyright 2014, Easywhere"
 __email__ = "ag@easywhere.ru"
 
-from flask.ext.login import login_required, login_user, current_user
+from flask.ext.login import login_required, current_user
 
 import os
 
@@ -17,8 +17,6 @@ from TrackerRestApi import Session
 from flask_jsonrpc import ServerError
 from sqlautocode_gen.model import *
 from sqlautocode_gen.avto_dggr_model import TrAvtoDGGR
-
-from modules import device_params
 
 
 def fillVihecleResponse(v):
@@ -256,6 +254,7 @@ def updateVehicle(user_id, id, name, maker, model, generation, modification, yea
 
 
 @jsonrpc.method('addSTS(user_id=Number, id=Number, sts=String, number=String) -> Object', validate=True, authenticated=False)
+@login_required
 def addSTS(user_id, id, sts, number):
     """
         Cyrillic encoding supports by attaching header: \"Content-Type: text/html; charset=UTF-8\"
@@ -264,7 +263,7 @@ def addSTS(user_id, id, sts, number):
 
     # TODO: Add validation sts and number
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == user_id).filter(TrVehicle.id == id).first()
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
 
     if v is None:
         session.close()
@@ -286,11 +285,12 @@ def addSTS(user_id, id, sts, number):
 
 
 @jsonrpc.method('delSTS(user_id=Number, id=Number) -> Object', validate=True, authenticated=False)
+@login_required
 def delSTS(user_id, id):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == user_id).filter(TrVehicle.id == id).first()
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
 
     if v is None:
         session.close()
@@ -350,6 +350,7 @@ def delVehicle(user_id, id):
 
 
 @jsonrpc.method('getMakers(user_id=Number, type=String) -> Object', validate=True, authenticated=False)
+@login_required
 def getMakers(user_id, type):
 
     session = Session()
@@ -364,6 +365,7 @@ def getMakers(user_id, type):
 
 
 @jsonrpc.method('getModelsByMaker(user_id=Number, type=String, maker=String) -> Any', validate=True, authenticated=False)
+@login_required
 def getModelByMaker(user_id, type, maker):
 
     session = Session()
@@ -379,6 +381,7 @@ def getModelByMaker(user_id, type, maker):
 
 
 @jsonrpc.method('getGenByModelByMaker(user_id=Number, type=String, maker=String, model=String) -> Any', validate=True, authenticated=False)
+@login_required
 def getGenerationByModelByMaker(user_id, type, maker, model):
 
     session = Session()
@@ -394,6 +397,7 @@ def getGenerationByModelByMaker(user_id, type, maker, model):
 
 
 @jsonrpc.method('getModifByGenByModelByMaker(user_id=Number, type=String, maker=String, model=String, generation=String) -> Any', validate=True, authenticated=False)
+@login_required
 def getModificationByGenByModelByMaker(user_id, type, maker, model, generation):
 
     session = Session()
@@ -409,6 +413,7 @@ def getModificationByGenByModelByMaker(user_id, type, maker, model, generation):
 
 
 @jsonrpc.method('getYearsByModifByGenByModelByMaker(user_id=Number, type=String, maker=String, model=String, generation=String, modification=String) -> Any', validate=True, authenticated=False)
+@login_required
 def getYearsByModifByGenByModelByMaker(user_id, type, maker, model, generation, modification):
 
     session = Session()
@@ -479,11 +484,12 @@ def doCalcTax(region, power, year):
 
 
 @jsonrpc.method('getRoadTax(user_id=Number, vehicle_id=Number)', validate=True, authenticated=False)
+@login_required
 def getRoadTax(user_id, vehicle_id):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == user_id).filter(TrVehicle.id == id).first()
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
 
     if v is None:
         session.close()
