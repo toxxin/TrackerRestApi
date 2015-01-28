@@ -1,14 +1,16 @@
-__author__ = 'Anton Glukhov'
+# -*- coding: utf-8 -*-
 
+__author__ = 'Anton Glukhov'
+__copyright__ = "Copyright 2014, Easywhere"
+__email__ = "ag@easywhere.ru"
 
 import calendar
 
-from flask.ext.login import login_required, login_user
+from flask.ext.login import login_required
 
 from TrackerRestApi import jsonrpc, app
 from TrackerRestApi import Session
 
-from flask_jsonrpc import ServerError
 from sqlautocode_gen.model import *
 
 
@@ -31,6 +33,7 @@ def fillNews(n):
 
 
 @jsonrpc.method('getRoad(user_id=Number,since=Number) -> Object', validate=True, authenticated=False)
+@login_required
 def getRoad(user_id, since):
 
     session = Session()
