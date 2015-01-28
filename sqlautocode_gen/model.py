@@ -11,104 +11,6 @@ from sqlautocode_gen.feed_model import association_table_user_feed
 
 
 class TrUser(DeclarativeBase):
-    __tablename__ = 'b_user'
-
-    __table_args__ = {'mysql_engine': 'InnoDB'}
-
-    #column definitions
-    ACTIVE = Column(u'ACTIVE', CHAR(length=1, collation=u'utf8_unicode_ci'), nullable=False)
-    ADMIN_NOTES = Column(u'ADMIN_NOTES', TEXT(collation=u'utf8_unicode_ci'))
-    AUTO_TIME_ZONE = Column(u'AUTO_TIME_ZONE', CHAR(length=1, collation=u'utf8_unicode_ci'))
-    CHECKWORD = Column(u'CHECKWORD', VARCHAR(length=50, collation=u'utf8_unicode_ci'))
-    CHECKWORD_TIME = Column(u'CHECKWORD_TIME', DATETIME())
-    CONFIRM_CODE = Column(u'CONFIRM_CODE', VARCHAR(length=8, collation=u'utf8_unicode_ci'))
-    DATE_REGISTER = Column(u'DATE_REGISTER', DATETIME(), nullable=False)
-    EMAIL = Column(u'EMAIL', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    EXTERNAL_AUTH_ID = Column(u'EXTERNAL_AUTH_ID', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    ID = Column(u'ID', INTEGER(), primary_key=True, nullable=False)
-    LAST_ACTIVITY_DATE = Column(u'LAST_ACTIVITY_DATE', DATETIME())
-    LAST_LOGIN = Column(u'LAST_LOGIN', DATETIME())
-    LAST_NAME = Column(u'LAST_NAME', VARCHAR(length=50, collation=u'utf8_unicode_ci'))
-    LID = Column(u'LID', CHAR(length=2, collation=u'utf8_unicode_ci'))
-    LOGIN = Column(u'LOGIN', VARCHAR(length=50, collation=u'utf8_unicode_ci'), nullable=False)
-    LOGIN_ATTEMPTS = Column(u'LOGIN_ATTEMPTS', INTEGER())
-    NAME = Column(u'NAME', VARCHAR(length=50, collation=u'utf8_unicode_ci'))
-    PASSWORD = Column(u'PASSWORD', VARCHAR(length=50, collation=u'utf8_unicode_ci'), nullable=False)
-    PERSONAL_BIRTHDATE = Column(u'PERSONAL_BIRTHDATE', VARCHAR(length=50, collation=u'utf8_unicode_ci'))
-    PERSONAL_BIRTHDAY = Column(u'PERSONAL_BIRTHDAY', DATE())
-    PERSONAL_CITY = Column(u'PERSONAL_CITY', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    PERSONAL_COUNTRY = Column(u'PERSONAL_COUNTRY', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    PERSONAL_FAX = Column(u'PERSONAL_FAX', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    PERSONAL_GENDER = Column(u'PERSONAL_GENDER', CHAR(length=1, collation=u'utf8_unicode_ci'))
-    PERSONAL_ICQ = Column(u'PERSONAL_ICQ', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    PERSONAL_MAILBOX = Column(u'PERSONAL_MAILBOX', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    PERSONAL_MOBILE = Column(u'PERSONAL_MOBILE', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    PERSONAL_NOTES = Column(u'PERSONAL_NOTES', TEXT(collation=u'utf8_unicode_ci'))
-    PERSONAL_PAGER = Column(u'PERSONAL_PAGER', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    PERSONAL_PHONE = Column(u'PERSONAL_PHONE', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    PERSONAL_PHOTO = Column(u'PERSONAL_PHOTO', INTEGER())
-    PERSONAL_PROFESSION = Column(u'PERSONAL_PROFESSION', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    PERSONAL_STATE = Column(u'PERSONAL_STATE', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    PERSONAL_STREET = Column(u'PERSONAL_STREET', TEXT(collation=u'utf8_unicode_ci'))
-    PERSONAL_WWW = Column(u'PERSONAL_WWW', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    PERSONAL_ZIP = Column(u'PERSONAL_ZIP', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    SECOND_NAME = Column(u'SECOND_NAME', VARCHAR(length=50, collation=u'utf8_unicode_ci'))
-    STORED_HASH = Column(u'STORED_HASH', VARCHAR(length=32, collation=u'utf8_unicode_ci'))
-    TIMESTAMP_X = Column(u'TIMESTAMP_X', TIMESTAMP(), nullable=False)
-    TIME_ZONE = Column(u'TIME_ZONE', VARCHAR(length=50, collation=u'utf8_unicode_ci'))
-    TIME_ZONE_OFFSET = Column(u'TIME_ZONE_OFFSET', INTEGER())
-    WORK_CITY = Column(u'WORK_CITY', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    WORK_COMPANY = Column(u'WORK_COMPANY', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    WORK_COUNTRY = Column(u'WORK_COUNTRY', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    WORK_DEPARTMENT = Column(u'WORK_DEPARTMENT', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    WORK_FAX = Column(u'WORK_FAX', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    WORK_LOGO = Column(u'WORK_LOGO', INTEGER())
-    WORK_MAILBOX = Column(u'WORK_MAILBOX', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    WORK_NOTES = Column(u'WORK_NOTES', TEXT(collation=u'utf8_unicode_ci'))
-    WORK_PAGER = Column(u'WORK_PAGER', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    WORK_PHONE = Column(u'WORK_PHONE', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    WORK_POSITION = Column(u'WORK_POSITION', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    WORK_PROFILE = Column(u'WORK_PROFILE', TEXT(collation=u'utf8_unicode_ci'))
-    WORK_STATE = Column(u'WORK_STATE', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    WORK_STREET = Column(u'WORK_STREET', TEXT(collation=u'utf8_unicode_ci'))
-    WORK_WWW = Column(u'WORK_WWW', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    WORK_ZIP = Column(u'WORK_ZIP', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-    XML_ID = Column(u'XML_ID', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
-
-    #relation definitions
-    # slaves = relationship("TrFollower", foreign_keys="TrFollower.master_id", cascade="all,delete")
-    # masters = relationship("TrFollower", foreign_keys="TrFollower.slave_id", cascade="all,delete")
-
-    # locations = relationship("TrULocation", foreign_keys="TrULocation.user_id", cascade="all,delete")
-
-    vehicles = relationship("TrVehicle", foreign_keys="TrVehicle.user_id", cascade="all,delete")
-
-    tokens = relationship("TrPushToken", foreign_keys="TrPushToken.user_id", cascade="all,delete")
-
-    feeds = relationship("TrFeed", secondary=association_table_user_feed)
-
-    places = relationship("TrPlace", foreign_keys="TrPlace.user_id", cascade="all,delete")
-
-    def is_authenticated(self):
-        return True
-
-    def is_active(self):
-        return True
-
-    def is_anonymous(self):
-        return False
-
-    def get_id(self):
-        return unicode(self.ID)
-
-    def __init__(self, date, login, password, active='Y'):
-        self.DATE_REGISTER = date
-        self.ACTIVE = active
-        self.LOGIN = login
-        self.PASSWORD = password
-
-
-class TrUserTest(DeclarativeBase):
     __tablename__ = 'tr_user'
 
     __table_args__ = {'mysql_engine': 'InnoDB'}
@@ -124,11 +26,20 @@ class TrUserTest(DeclarativeBase):
     token = Column(u'token', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
     session = Column(u'session', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
 
+    vehicles = relationship("TrVehicle", foreign_keys="TrVehicle.user_id", cascade="all,delete")
+
+    tokens = relationship("TrPushToken", foreign_keys="TrPushToken.user_id", cascade="all,delete")
+
+    feeds = relationship("TrFeed", secondary=association_table_user_feed)
+
+    places = relationship("TrPlace", foreign_keys="TrPlace.user_id", cascade="all,delete")
+
     def is_authenticated(self):
         return self.authenticated
 
     def is_active(self):
-        return True if self.active == 'Y' else False
+        # return True if self.active == 'Y' else False
+        return True
 
     def is_anonymous(self):
         return False
@@ -141,6 +52,7 @@ class TrUserTest(DeclarativeBase):
 
     def __init__(self, login, auth_code, active='Y', authenticated=False, token=None, session=None):
         self.login = login
+        self.authenticated = authenticated
         self.auth_code = auth_code
         self.active = active
         self.token = token
@@ -164,7 +76,7 @@ class TrVehicle(DeclarativeBase):
     car_number = Column(u'car_number', String(10), nullable=True)
     last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
     creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
-    user_id = Column(u'user_id', Integer, ForeignKey('b_user.ID'), nullable=False)
+    user_id = Column(u'user_id', Integer, ForeignKey('tr_user.id'), nullable=False)
 
     #relation definitions
     device = relationship("TrDevice", foreign_keys="TrDevice.vehicle_id", uselist=False)
@@ -232,41 +144,6 @@ class TrDevice(DeclarativeBase):
         self.vehicle_id = vehicle_id
 
 
-# class TrEvent(DeclarativeBase):
-#     __tablename__ = 'tr_event'
-#
-#     __table_args__ = {'mysql_engine': 'InnoDB'}
-#
-#     #column definitions
-#     event_ID = Column(u'event_ID', INTEGER(), primary_key=True)
-#     event_deviceID = Column(u'event_deviceID', INTEGER(), nullable=False)
-#     #FIXME:: boolean type
-#     event_stat = Column(u'event_stat', Integer(), nullable=False)
-#
-#     #relation definitions
-#     tr_geozone = relationship("TrGeozone", uselist=False, backref="tr_event", cascade="delete")
-#
-# class TrGeozone(DeclarativeBase):
-#     __tablename__ = 'tr_geozone'
-#
-#     __table_args__ = {'mysql_engine': 'InnoDB'}
-#
-#     #column definitions
-#     geozone_ID = Column(u'geozone_ID', INTEGER(), primary_key=True, nullable=False)
-#     geozone_center = Column(u'geozone_center', VARCHAR(length=20), nullable=False)
-#     geozone_color = Column(u'geozone_color', VARCHAR(length=12), nullable=False)
-#     geozone_eventID = Column(u'geozone_eventID', INTEGER(), ForeignKey('tr_event.event_ID'))
-#     geozone_name = Column(u'geozone_name', VARCHAR(length=20), nullable=False)
-#     geozone_radius = Column(u'geozone_radius', INTEGER(), nullable=False)
-#
-#     def __init__(self, id):
-#         self.geozone_ID = id
-#
-#     def __repr__(self):
-#         return "<User(id='%d', name='%s', radius='%d', center='%s')>" % \
-#                                     (self.geozone_ID, self.geozone_name, self.geozone_radius, self.geozone_center)
-
-
 '''Shape params:    0: circle, 1: square, 2: random'''
 class TrDGeozone(DeclarativeBase):
     __tablename__ = 'tr_dgeozone'
@@ -299,37 +176,6 @@ class TrDGeozone(DeclarativeBase):
                                         (self.id, self.name, self.shape, self.center, self.radius, self.color)
 
 
-
-# '''Shape params:    0: circle, 1: square, 2: random'''
-# class TrFGeozone(DeclarativeBase):
-#     __tablename__ = 'tr_fgeozone'
-#
-#     __table_args__ = {'mysql_engine': 'InnoDB'}
-#
-#     #column definitions
-#     id = Column(u'id', Integer, primary_key=True)
-#     name = Column(u'name', String(20), nullable=False)
-#     state = Column(u'state', Boolean, nullable=False)
-#     shape = Column(u'shape', SmallInteger, nullable=False)
-#     center = Column(u'center', String(20), nullable=False)
-#     radius = Column(u'radius', Integer, nullable=False);
-#     color = Column(u'color', String(7), nullable=False)
-#
-#     follower_id = Column(u'follower_id', Integer, ForeignKey('tr_follower.id'), nullable=False)
-#
-#     def __init__(self, center, name = "NewGeo", state = True, shape = 0, radius = 100, color = "#00ff00"):
-#         self.name = name
-#         self.state = state
-#         self.shape = shape
-#         self.center = center
-#         self.radius = radius
-#         self.color = color
-#
-#     def __repr__(self):
-#         return "<FGeo(id='%d', name='%s', shape='%d', center='%s', radius='%d', vertices='%s', color='%s')>" % \
-#                                         (self.id, self.name, self.shape, self.center, self.radius, self.vertices, self.color)
-
-
 class TrDLocation(DeclarativeBase):
     __tablename__ = 'tr_dlocation'
 
@@ -357,50 +203,6 @@ class TrDLocation(DeclarativeBase):
                                         (self.id, self.lat_log, self.altitude, self.accuracy, self.speed, self.creation_date, self.device_id)
 
 
-# class TrULocation(DeclarativeBase):
-#     __tablename__ = 'tr_ulocation'
-#
-#     __table_args__ = {'mysql_engine': 'InnoDB'}
-#
-#     #colomn definition
-#     id = Column(u'id', Integer, primary_key=True)
-#     lat_log = Column(u'lat_log', String(20), nullable=False)
-#     accuracy = Column(u'accuracy', Integer, nullable=False)
-#     battery = Column(u'battery', SmallInteger, nullable=True)
-#     speed = Column(u'speed', SmallInteger, nullable=True)
-#     creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
-#     user_id = Column(u'user_id', Integer, ForeignKey('b_user.ID'), nullable=False)
-#
-#     def __init__(self, lat_log, accuracy, creation_date, user_id, battery=null, speed=null):
-#         self.lat_log = lat_log
-#         self.accuracy = accuracy
-#         self.battery = battery
-#         self.speed = speed
-#         self.creation_date = creation_date
-#         self.user_id = user_id
-#
-#     def __repr__(self):
-#         return "UserLocation(id='%d', lat_log='%s', accuracy='%d' creation_date='%s', user_id='%d')>" % \
-#                 (self.id, self.lat_log, self.accuracy, self.creation_date, self.user_id)
-#
-#
-# class TrFollower(DeclarativeBase):
-#     __tablename__ = 'tr_follower'
-#
-#     __table_args__ = {'mysql_engine': 'InnoDB'}
-#
-#     #colomn definition
-#     id = Column(u'id', Integer, primary_key=True)
-#     alias = Column(u'alias', String(20), nullable=True)
-#     state = Column(u'state', Boolean, nullable=False)
-#     master_id = Column(u'master_id', Integer, ForeignKey('b_user.ID'), nullable=False)
-#     slave_id = Column(u'slave_id', Integer, ForeignKey('b_user.ID'), nullable=False)
-#     hw_id = Column(u'hw_id', String(20))
-#
-#     #relation definitions
-#     geos = relationship("TrFGeozone", backref="tr_follower", cascade="all,delete")
-
-
 class TrPushToken(DeclarativeBase):
     __tablename__ = 'tr_ptoken'
 
@@ -412,7 +214,7 @@ class TrPushToken(DeclarativeBase):
     platform = Column(u'platform', CHAR(length=1), nullable=False)
     token = Column(u'token', Text(4096), nullable=False)
     creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
-    user_id = Column(u'user_id', Integer, ForeignKey('b_user.ID'), nullable=False)
+    user_id = Column(u'user_id', Integer, ForeignKey('tr_user.id'), nullable=False)
 
     def __init__(self, hardware_id, platform, token, user_id):
         self.hardware_id = hardware_id
@@ -482,7 +284,7 @@ class TrPlace(DeclarativeBase):
     type = Column(u'type', String(30), nullable=False)
     last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
     creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
-    user_id = Column(u'user_id', Integer, ForeignKey('b_user.ID'), nullable=False)
+    user_id = Column(u'user_id', Integer, ForeignKey('tr_user.id'), nullable=False)
 
     def __init__(self, user_id, title, longitude, latitude, type, desc=None):
         self.title = title
@@ -492,17 +294,6 @@ class TrPlace(DeclarativeBase):
         self.desc = desc
         self.user_id = user_id
 
-# try:
-#     TrPushToken.__table__.drop(engine)
-# except:
-#     pass
-# metadata.create_all(engine)
-
-# try:
-#     TrTestGeozone.__table__.drop(engine)
-# except:
-#     pass
-# metadata.create_all(engine)
 
 # try:
 #     TrFGeozone.__table__.drop(engine)
