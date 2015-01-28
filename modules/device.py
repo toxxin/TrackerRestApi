@@ -4,15 +4,13 @@ __author__ = 'Anton Glukhov'
 __copyright__ = "Copyright 2014, Easywhere"
 __email__ = "ag@easywhere.ru"
 
-from flask.ext.login import login_required, login_user
+from flask.ext.login import login_required, current_user
 
 from TrackerRestApi import jsonrpc
 from TrackerRestApi import Session
 
 from flask_jsonrpc import ServerError
 from sqlautocode_gen.model import *
-
-from modules import device_params
 
 
 def fillDeviceResponse(dev):
@@ -29,21 +27,17 @@ def fillDeviceResponse(dev):
 
 
 @jsonrpc.method('getDevice(user_id=Number,device_id=Number) -> Any', validate=True, authenticated=False)
+@login_required
 def getDevice(user_id, device_id):
 
     session = Session()
 
-    t = session.query(TrVehicle.id).filter(TrVehicle.user_id == user_id).subquery('t')
+    t = session.query(TrVehicle.id).filter(TrVehicle.user_id == int(current_user.get_id())).subquery('t')
     dev = session.query(TrDevice).filter(TrDevice.id == device_id).filter(TrDevice.vehicle_id == t.c.id).first()
 
     if dev is None:
         session.close()
         raise ServerError("Device doesn't exist.")
-
-#TODO:: user login example
-    # user = session.query(TrUser).get(int(17))
-
-    # login_user(user)
 
     session.close()
 
@@ -51,12 +45,12 @@ def getDevice(user_id, device_id):
 
 
 @jsonrpc.method('getDevices(user_id=Number) -> Any', validate=True, authenticated=False)
-# @login_required
+@login_required
 def getDevices(user_id):
 
     session = Session()
 
-    t = session.query(TrVehicle.id).filter(TrVehicle.user_id == user_id).subquery('t')
+    t = session.query(TrVehicle.id).filter(TrVehicle.user_id == int(current_user.get_id())).subquery('t')
     devs = session.query(TrDevice).filter(TrDevice.vehicle_id == t.c.id).all()
 
     lst = [fillDeviceResponse(dev) for dev in devs]
@@ -67,12 +61,12 @@ def getDevices(user_id):
 
 
 @jsonrpc.method('delDevice(user_id=Number,device_id=Number) -> Object', validate=True, authenticated=False)
-# @login_required
+@login_required
 def delDevice(user_id, device_id):
 
     session = Session()
 
-    t = session.query(TrVehicle.id).filter(TrVehicle.user_id == user_id).subquery('t')
+    t = session.query(TrVehicle.id).filter(TrVehicle.user_id == int(current_user.get_id())).subquery('t')
     dev = session.query(TrDevice).filter(TrDevice.vehicle_id == t.c.id).filter(TrDevice.id == device_id).first()
 
     if dev is None:
@@ -98,7 +92,7 @@ def delDevice(user_id, device_id):
 #
 #     session = Session()
 #
-#     dev = session.query(TrDevice).filter(TrDevice.device_userID == user_id).\
+#     dev = session.query(TrDevice).filter(TrDevice.device_userID == int(current_user.get_id())).\
 #                                     filter(TrDevice.device_ID == device_id).first()
 #
 #     if dev is None:
@@ -126,11 +120,12 @@ def delDevice(user_id, device_id):
 
 
 @jsonrpc.method('regDevice(user_id=Number,vehicle_id=Number,sn=String,secret_code=String) -> Object', validate=True, authenticated=False)
+@login_required
 def regDevice(user_id, vehicle_id, sn, secret_code):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == user_id).\
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).\
                                     filter(TrVehicle.id == vehicle_id).first()
 
     if v is None:
@@ -167,11 +162,12 @@ def regDevice(user_id, vehicle_id, sn, secret_code):
 
 
 @jsonrpc.method('unregDevice(user_id=Number,vehicle_id=Number,device_id=Number) -> Object', validate=True, authenticated=False)
+@login_required
 def unregDevice(user_id, vehicle_id, device_id):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == user_id).\
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).\
                                 filter(TrVehicle.id == vehicle_id).first()
 
     if v is None:
