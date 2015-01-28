@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 
 from flask.ext.jsonrpc import ServerError
 from flask.ext.login import login_user, login_required, logout_user, current_user
-from sqlautocode_gen.model import TrUserTest
+from sqlautocode_gen.model import TrUser
 
 from TrackerRestApi import jsonrpc, app
 from TrackerRestApi import Session
@@ -26,10 +26,10 @@ def getCode(number):
     sms = SmsEpochta()
     code = ''.join(random.choice(string.digits) for _ in range(app.config.get('SMS_CODE_LEN')))
 
-    u = session.query(TrUserTest).filter(TrUserTest.login == number).first()
+    u = session.query(TrUser).filter(TrUser.login == number).first()
 
     if u is None:
-        u = TrUserTest(login=number, auth_code=code, active='N')
+        u = TrUser(login=number, auth_code=code, active='N')
         session.add(u)
     else:
         setattr(u, 'auth_code', code)
@@ -55,7 +55,7 @@ def login(id, code):
 
     s = Session()
 
-    u = s.query(TrUserTest).filter(TrUserTest.id == id).first()
+    u = s.query(TrUser).filter(TrUser.id == id).first()
 
     if u is None:
         s.close()
