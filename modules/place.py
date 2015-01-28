@@ -4,9 +4,9 @@ __author__ = 'Anton Glukhov'
 __copyright__ = "Copyright 2014, Easywhere"
 __email__ = "ag@easywhere.ru"
 
-from flask.ext.login import login_required, login_user
+from flask.ext.login import login_required, current_user
 
-from TrackerRestApi import jsonrpc, app
+from TrackerRestApi import jsonrpc
 from TrackerRestApi import Session
 
 from flask_jsonrpc import ServerError, InvalidParamsError
@@ -33,11 +33,12 @@ place_types = ["hotel", "restaurant", "cafe"]
 
 
 @jsonrpc.method('getPlaces(user_id=Number) -> Any', validate=True, authenticated=False)
+@login_required
 def getPlaces(user_id):
 
     session = Session()
 
-    pls = session.query(TrPlace).filter(TrPlace.user_id == user_id).all()
+    pls = session.query(TrPlace).filter(TrPlace.user_id == int(current_user.get_id())).all()
 
     lst = [fillPlaceResponse(p) for p in pls]
 
@@ -47,22 +48,15 @@ def getPlaces(user_id):
 
 
 @jsonrpc.method('addPlace(user_id=Number, title=String, longitude=String, latitude=String, type=String, desc=String) -> Object', validate=True, authenticated=False)
+@login_required
 def addPlace(user_id, title, longitude, latitude, type, desc):
 
     session = Session()
 
-    u = session.query(TrUser).get(user_id)
-
-    if u is None:
-        session.close()
-        raise ServerError("User doesn't exist.")
-
-    p = TrPlace(user_id=user_id, title=title, longitude=float(longitude), latitude=float(latitude), type=type, desc=desc)
+    p = TrPlace(user_id=int(current_user.get_id()), title=title, longitude=float(longitude), latitude=float(latitude), type=type, desc=desc)
 
     try:
         session.add(p)
-        session.commit()
-        session.flush()
         session.commit()
         session.refresh(p)
     except:
@@ -75,11 +69,12 @@ def addPlace(user_id, title, longitude, latitude, type, desc):
 
 
 @jsonrpc.method('delPlace(user_id=Number, place_id=Number) -> Object', validate=True, authenticated=False)
+@login_required
 def delPlace(user_id, place_id):
 
     session = Session()
 
-    p = session.query(TrPlace).filter(TrPlace.user_id == user_id).filter(TrPlace.id == place_id).first()
+    p = session.query(TrPlace).filter(TrPlace.user_id == int(current_user.get_id())).filter(TrPlace.id == place_id).first()
 
     if p is None:
         session.close()
@@ -104,11 +99,12 @@ def isAllIncluded(S1, S2):
     return False if len(set(S1).intersection(S2)) != len(set(S1)) else True
 
 @jsonrpc.method('updatePlace(user_id=Number, place_id=Number, title=String, longitude=String, latitude=String, type=String, desc=String) -> Object', validate=False, authenticated=False)
+@login_required
 def updatePlace(user_id, place_id, **kwargs):
 
     session = Session()
 
-    p = session.query(TrPlace).filter(TrPlace.user_id == user_id).filter(TrPlace.id == place_id).first()
+    p = session.query(TrPlace).filter(TrPlace.user_id == int(current_user.get_id())).filter(TrPlace.id == place_id).first()
 
     if p is None:
         session.close()
