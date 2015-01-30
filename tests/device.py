@@ -1,4 +1,8 @@
+# -*- coding: utf-8 -*-
+
 __author__ = 'Anton Glukhov'
+__copyright__ = "Copyright 2014, Easywhere"
+__email__ = "ag@easywhere.ru"
 
 import unittest
 from base import BaseTestCase
@@ -22,9 +26,9 @@ class DeviceBaseTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "u1", "testtest")
-        cls.u2 = TrUser("2013-12-12 12:12:12", "u2", "testtest")
-        cls.u3 = TrUser("2013-12-12 12:12:12", "u3", "testtest")
+        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
         u_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(u_list)
         session.add_all(u_list)
@@ -33,9 +37,9 @@ class DeviceBaseTestCase(BaseTestCase):
         session.refresh(cls.u2)
         session.commit()
 
-        cls.v1 = TrVehicle("v1", cls.u1.ID, car_model_id=111, year=1991)
-        cls.v2 = TrVehicle("v2", cls.u2.ID, car_model_id=111, year=1991)
-        cls.v3 = TrVehicle("v3", cls.u2.ID, car_model_id=111, year=1991)
+        cls.v1 = TrVehicle("v1", cls.u1.id, car_model_id=111, year=1991)
+        cls.v2 = TrVehicle("v2", cls.u2.id, car_model_id=111, year=1991)
+        cls.v3 = TrVehicle("v3", cls.u2.id, car_model_id=111, year=1991)
         v_list = [cls.v1, cls.v2, cls.v3]
         cls.v_count = len(v_list)
         session.add_all(v_list)
@@ -83,7 +87,7 @@ class DeviceBaseTestCase(BaseTestCase):
 
         self.assertEquals(len(self.u3.vehicles), 0)
 
-        # data = server.getDevices(self.u3.ID)
+        # data = server.getDevices(self.u3.id)
         #
         # self.assertIn(u'result', data)
         # self.assertEquals(len(data['result']), 0)
@@ -104,7 +108,7 @@ class DeviceBaseTestCase(BaseTestCase):
 
         self.session.add(self.u1)
 
-        data = server.getDevices(self.u1.ID)
+        data = server.getDevices(self.u1.id)
 
         self.assertIn(u'jsonrpc', data)
         self.assertIn(u'result', data)
@@ -123,9 +127,9 @@ class DeviceGetTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "u1", "testtest")
-        cls.u2 = TrUser("2013-12-12 12:12:12", "u2", "testtest")
-        cls.u3 = TrUser("2013-12-12 12:12:12", "u3", "testtest")
+        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
         u_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(u_list)
         session.add_all(u_list)
@@ -134,9 +138,9 @@ class DeviceGetTestCase(BaseTestCase):
         session.refresh(cls.u2)
         session.commit()
 
-        cls.v1 = TrVehicle("v1", cls.u1.ID, car_model_id=111, year=2000)
-        cls.v2 = TrVehicle("v2", cls.u2.ID, car_model_id=111, year=2000)
-        cls.v3 = TrVehicle("v3", cls.u2.ID, car_model_id=111, year=2000)
+        cls.v1 = TrVehicle("v1", cls.u1.id, car_model_id=111, year=2000)
+        cls.v2 = TrVehicle("v2", cls.u2.id, car_model_id=111, year=2000)
+        cls.v3 = TrVehicle("v3", cls.u2.id, car_model_id=111, year=2000)
         v_list = [cls.v1, cls.v2, cls.v3]
         cls.v_count = len(v_list)
         session.add_all(v_list)
@@ -175,7 +179,7 @@ class DeviceGetTestCase(BaseTestCase):
 
         self.session.add(self.u1)
 
-        data = server.getDevices(self.u1.ID)
+        data = server.getDevices(self.u1.id)
 
         self.assertIn(u'result', data)
         self.assertEquals(len(data['result']), 1)
@@ -185,7 +189,7 @@ class DeviceGetTestCase(BaseTestCase):
 
         self.session.add(self.u3)
 
-        data = server.getDevices(self.u3.ID)
+        data = server.getDevices(self.u3.id)
 
         self.assertIn(u'result', data)
         self.assertEquals(len(data['result']), 0)
@@ -198,9 +202,9 @@ class DeviceDeleteTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "u1", "testtest")
-        cls.u2 = TrUser("2013-12-12 12:12:12", "u2", "testtest")
-        cls.u3 = TrUser("2013-12-12 12:12:12", "u3", "testtest")
+        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
         u_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(u_list)
         session.add_all(u_list)
@@ -209,9 +213,9 @@ class DeviceDeleteTestCase(BaseTestCase):
         session.refresh(cls.u2)
         session.commit()
 
-        cls.v1 = TrVehicle("v1", cls.u1.ID, car_model_id=111, year=2000)
-        cls.v2 = TrVehicle("v2", cls.u2.ID, car_model_id=111, year=2000)
-        cls.v3 = TrVehicle("v3", cls.u2.ID, car_model_id=111, year=2000)
+        cls.v1 = TrVehicle("v1", cls.u1.id, car_model_id=111, year=2000)
+        cls.v2 = TrVehicle("v2", cls.u2.id, car_model_id=111, year=2000)
+        cls.v3 = TrVehicle("v3", cls.u2.id, car_model_id=111, year=2000)
         v_list = [cls.v1, cls.v2, cls.v3]
         cls.v_count = len(v_list)
         session.add_all(v_list)
@@ -252,7 +256,7 @@ class DeviceDeleteTestCase(BaseTestCase):
         self.session.add(self.v1)
         self.session.add(self.d1)
 
-        data = server.delDevice(self.u1.ID, self.d1.id)
+        data = server.delDevice(self.u1.id, self.d1.id)
 
         self.assertJsonRpc(data)
 
@@ -268,7 +272,7 @@ class DeviceDeleteTestCase(BaseTestCase):
         self.session.add(self.u1)
         self.session.add(self.d1)
 
-        data = server.delDevice(self.u1.ID, self.d1.id + 1000)
+        data = server.delDevice(self.u1.id, self.d1.id + 1000)
 
         self.assertJsonRpcErr(data)
         self.assertEquals(data['error'][u'message'], "ServerError: Device doesn't exist.")
@@ -279,7 +283,7 @@ class DeviceDeleteTestCase(BaseTestCase):
         self.session.add(self.v2)
         self.session.add(self.d2)
 
-        data = server.delVehicle(self.u2.ID, self.v2.id)
+        data = server.delVehicle(self.u2.id, self.v2.id)
 
         self.assertJsonRpc(data)
 
@@ -318,9 +322,9 @@ class DeviceRegistrationTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "u1", "testtest")
-        cls.u2 = TrUser("2013-12-12 12:12:12", "u2", "testtest")
-        cls.u3 = TrUser("2013-12-12 12:12:12", "u3", "testtest")
+        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
         u_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(u_list)
         session.add_all(u_list)
@@ -330,9 +334,9 @@ class DeviceRegistrationTestCase(BaseTestCase):
         session.refresh(cls.u3)
         session.commit()
 
-        cls.v1 = TrVehicle("v1", cls.u1.ID, car_model_id=111, year=2000)
-        cls.v2 = TrVehicle("v2", cls.u2.ID, car_model_id=111, year=2000)
-        cls.v3 = TrVehicle("v3", cls.u3.ID, car_model_id=111, year=2000)
+        cls.v1 = TrVehicle("v1", cls.u1.id, car_model_id=111, year=2000)
+        cls.v2 = TrVehicle("v2", cls.u2.id, car_model_id=111, year=2000)
+        cls.v3 = TrVehicle("v3", cls.u3.id, car_model_id=111, year=2000)
         v_list = [cls.v1, cls.v2, cls.v3]
         cls.v_count = len(v_list)
         session.add_all(v_list)
@@ -372,7 +376,7 @@ class DeviceRegistrationTestCase(BaseTestCase):
         self.session.add(self.v1)
         self.session.add(self.d1)
 
-        data = server.regDevice(user_id=self.u1.ID, vehicle_id=self.v1.id, sn='EW-14100001-UT', secret_code='sec1')
+        data = server.regDevice(user_id=self.u1.id, vehicle_id=self.v1.id, sn='EW-14100001-UT', secret_code='sec1')
 
         self.assertJsonRpc(data)
 
@@ -394,7 +398,7 @@ class DeviceRegistrationTestCase(BaseTestCase):
         self.session.add(self.d2)
         self.session.add(self.d3)
 
-        data = server.regDevice(user_id=self.u2.ID, vehicle_id=self.v2.id, sn='EW-14100003-UT', secret_code='sec3')
+        data = server.regDevice(user_id=self.u2.id, vehicle_id=self.v2.id, sn='EW-14100003-UT', secret_code='sec3')
 
         self.assertJsonRpcErr(data)
         self.assertEquals(data['error'][u'message'], "ServerError: Vehicle already has device.")
@@ -405,7 +409,7 @@ class DeviceRegistrationTestCase(BaseTestCase):
         self.session.add(self.v3)
         self.session.add(self.d2)
 
-        data = server.regDevice(user_id=self.u3.ID, vehicle_id=self.v3.id, sn='EW-14100002-UT', secret_code='sec2')
+        data = server.regDevice(user_id=self.u3.id, vehicle_id=self.v3.id, sn='EW-14100002-UT', secret_code='sec2')
 
         self.assertJsonRpcErr(data)
         self.assertEquals(data['error'][u'message'], "ServerError: Device is already in use.")
@@ -416,7 +420,7 @@ class DeviceRegistrationTestCase(BaseTestCase):
         self.session.add(self.v2)
         self.session.add(self.d2)
 
-        data = server.regDevice(user_id=self.u2.ID, vehicle_id=self.v2.id, sn='EW-14100002-UT', secret_code='sec2')
+        data = server.regDevice(user_id=self.u2.id, vehicle_id=self.v2.id, sn='EW-14100002-UT', secret_code='sec2')
 
         self.assertJsonRpcErr(data)
         self.assertEquals(data['error'][u'message'], "ServerError: Device is already in use.")
@@ -436,9 +440,9 @@ class DeviceUnRegistrationTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "u1", "testtest")
-        cls.u2 = TrUser("2013-12-12 12:12:12", "u2", "testtest")
-        cls.u3 = TrUser("2013-12-12 12:12:12", "u3", "testtest")
+        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
         u_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(u_list)
         session.add_all(u_list)
@@ -448,9 +452,9 @@ class DeviceUnRegistrationTestCase(BaseTestCase):
         session.refresh(cls.u3)
         session.commit()
 
-        cls.v1 = TrVehicle("v1", cls.u1.ID, car_model_id=111, year=2000)
-        cls.v2 = TrVehicle("v2", cls.u2.ID, car_model_id=111, year=2000)
-        cls.v3 = TrVehicle("v3", cls.u3.ID, car_model_id=111, year=2000)
+        cls.v1 = TrVehicle("v1", cls.u1.id, car_model_id=111, year=2000)
+        cls.v2 = TrVehicle("v2", cls.u2.id, car_model_id=111, year=2000)
+        cls.v3 = TrVehicle("v3", cls.u3.id, car_model_id=111, year=2000)
         v_list = [cls.v1, cls.v2, cls.v3]
         cls.v_count = len(v_list)
         session.add_all(v_list)
@@ -490,7 +494,7 @@ class DeviceUnRegistrationTestCase(BaseTestCase):
         self.session.add(self.v1)
         self.session.add(self.d1)
 
-        data = server.unregDevice(user_id=self.u1.ID, vehicle_id=self.v1.id, device_id=self.d1.id)
+        data = server.unregDevice(user_id=self.u1.id, vehicle_id=self.v1.id, device_id=self.d1.id)
 
         self.assertJsonRpc(data)
 
@@ -513,7 +517,7 @@ class DeviceUnRegistrationTestCase(BaseTestCase):
         self.session.add(self.v3)
         self.session.add(self.d1)
 
-        data = server.unregDevice(user_id=self.u3.ID, vehicle_id=self.v3.id, device_id=self.d1.id + 1000)
+        data = server.unregDevice(user_id=self.u3.id, vehicle_id=self.v3.id, device_id=self.d1.id + 1000)
 
         self.assertJsonRpcErr(data)
         self.assertEquals(data['error'][u'message'], "ServerError: Incorrect device or doesn't exist.")
@@ -524,7 +528,7 @@ class DeviceUnRegistrationTestCase(BaseTestCase):
         self.session.add(self.v2)
         self.session.add(self.d3)
 
-        data = server.unregDevice(user_id=self.u2.ID, vehicle_id=self.v2.id, device_id=self.d3.id)
+        data = server.unregDevice(user_id=self.u2.id, vehicle_id=self.v2.id, device_id=self.d3.id)
 
         self.assertJsonRpcErr(data)
         self.assertEquals(data['error'][u'message'], "ServerError: Incorrect device or doesn't exist.")
@@ -545,7 +549,7 @@ class DeviceUnRegistrationTestCase(BaseTestCase):
 #         session.refresh(cls.u1)
 #         session.commit()
 #
-#         cls.d1 = TrDevice("d1", cls.u1.ID)
+#         cls.d1 = TrDevice("d1", cls.u1.id)
 #         device_list = [cls.d1]
 #         cls.device_count = len(device_list)
 #         session.add_all(device_list)
@@ -568,36 +572,36 @@ class DeviceUnRegistrationTestCase(BaseTestCase):
 #     @unittest.skip("Reconfig structure.")
 #     def test_update_device_name(self):
 #
-#         data = server.updateDevice(user_id=self.u1.ID, device_id=self.d1.device_ID, alias="new_name")
+#         data = server.updateDevice(user_id=self.u1.id, device_id=self.d1.device_ID, alias="new_name")
 #
 #         self.assertJsonRpc(data)
 #         self.assertIs(data['result'], True)
 #
-#         data = server.getDevices(self.u1.ID)
+#         data = server.getDevices(self.u1.id)
 #
 #         self.assertJsonRpc(data)
 #         self.assertEquals(data['result'][0][u'name'], u'new_name')
 #     @unittest.skip("Reconfig structure.")
 #     def test_update_time_interval(self):
 #
-#         data = server.updateDevice(user_id=self.u1.ID, device_id=self.d1.device_ID, time_interval=12)
+#         data = server.updateDevice(user_id=self.u1.id, device_id=self.d1.device_ID, time_interval=12)
 #
 #         self.assertJsonRpc(data)
 #         self.assertIs(data['result'], True)
 #
-#         data = server.getDevices(self.u1.ID)
+#         data = server.getDevices(self.u1.id)
 #
 #         self.assertJsonRpc(data)
 #         self.assertEquals(data['result'][0][u'time_interval'], 12)
 #     @unittest.skip("Reconfig structure.")
 #     def test_update_accel_stat(self):
 #
-#         data = server.updateDevice(user_id=self.u1.ID, device_id=self.d1.device_ID, accel_stat=True)
+#         data = server.updateDevice(user_id=self.u1.id, device_id=self.d1.device_ID, accel_stat=True)
 #
 #         self.assertJsonRpc(data)
 #         self.assertIs(data['result'], True)
 #
-#         data = server.getDevices(self.u1.ID)
+#         data = server.getDevices(self.u1.id)
 #
 #         self.assertJsonRpc(data)
 #         self.assertEquals(data['result'][0][u'accel_stat'], True)
@@ -608,7 +612,7 @@ class DeviceUnRegistrationTestCase(BaseTestCase):
 #     @unittest.skip("Reconfig structure.")
 #     def test_update_device_incorrect_param(self):
 #
-#         data = server.updateDevice(user_id=self.u1.ID, device_id=self.d1.device_ID, wrong_param="test")
+#         data = server.updateDevice(user_id=self.u1.id, device_id=self.d1.device_ID, wrong_param="test")
 #
 #         self.assertJsonRpcErr(data)
 #         self.assertEquals(data['error']['message'], u'ServerError: Incorrect arg: wrong_param')
@@ -617,11 +621,11 @@ class DeviceUnRegistrationTestCase(BaseTestCase):
 #     def test_update_device_incorrect_value(self):
 #
 #         """Auto cast to unicode. Ex.: Boolean: True -> u'1'; Number: 12 - > u'12'"""
-#         data = server.updateDevice(user_id=self.u1.ID, device_id=self.d1.device_ID, alias=True)
+#         data = server.updateDevice(user_id=self.u1.id, device_id=self.d1.device_ID, alias=True)
 #
 #         self.assertJsonRpc(data)
 #
-#         data = server.getDevices(self.u1.ID)
+#         data = server.getDevices(self.u1.id)
 #         print data
 #         self.assertJsonRpc(data)
 
