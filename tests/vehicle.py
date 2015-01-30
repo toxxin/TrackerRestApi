@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+
 __author__ = 'Anton Glukhov'
+__copyright__ = "Copyright 2014, Easywhere"
+__email__ = "ag@easywhere.ru"
 
 import unittest
 from base import BaseTestCase
@@ -23,9 +26,9 @@ class VehicleBaseTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "u1", "testtest")
-        cls.u2 = TrUser("2013-12-12 12:12:12", "u2", "testtest")
-        cls.u3 = TrUser("2013-12-12 12:12:12", "u3", "testtest")
+        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
         user_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(user_list)
         session.add_all(user_list)
@@ -34,9 +37,9 @@ class VehicleBaseTestCase(BaseTestCase):
         session.refresh(cls.u2)
         session.commit()
 
-        cls.v1 = TrVehicle("v1", cls.u1.ID, car_model_id=111, year=2000)
-        cls.v2 = TrVehicle("v2", cls.u2.ID, car_model_id=222, year=2000)
-        cls.v3 = TrVehicle("v3", cls.u2.ID, car_model_id=333, year=2000)
+        cls.v1 = TrVehicle("v1", cls.u1.id, car_model_id=111, year=2000)
+        cls.v2 = TrVehicle("v2", cls.u2.id, car_model_id=222, year=2000)
+        cls.v3 = TrVehicle("v3", cls.u2.id, car_model_id=333, year=2000)
         v_list = [cls.v1, cls.v2, cls.v3]
         cls.v_count = len(v_list)
         session.add_all(v_list)
@@ -61,7 +64,7 @@ class VehicleBaseTestCase(BaseTestCase):
 
         self.session.add_all([self.u1, self.u2, self.u3])
 
-        data = server.getVehicles(self.u3.ID)
+        data = server.getVehicles(self.u3.id)
 
         self.assertIn(u'result', data)
         self.assertEquals(len(data['result']), 0)
@@ -70,7 +73,7 @@ class VehicleBaseTestCase(BaseTestCase):
 
         self.session.add_all([self.u1, self.u2, self.u3])
 
-        data = server.getVehicles(self.u1.ID)
+        data = server.getVehicles(self.u1.id)
 
         self.assertIn(u'result', data)
         self.assertEquals(len(data['result']), 1)
@@ -79,7 +82,7 @@ class VehicleBaseTestCase(BaseTestCase):
 
         self.session.add_all([self.u1, self.u2, self.u3])
 
-        data = server.getVehicles(self.u2.ID)
+        data = server.getVehicles(self.u2.id)
 
         self.assertIn(u'result', data)
         self.assertEquals(len(data['result']), 2)
@@ -88,7 +91,7 @@ class VehicleBaseTestCase(BaseTestCase):
 
         self.session.add_all([self.u1, self.u2, self.u3])
 
-        data = server.getVehicles(self.u1.ID)
+        data = server.getVehicles(self.u1.id)
 
         self.assertIn(u'jsonrpc', data)
         self.assertIn(u'result', data)
@@ -105,7 +108,7 @@ class VehicleAddTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "user_del", "testtest")
+        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
         session.add(cls.u1)
         session.flush()
         session.refresh(cls.u1)
@@ -130,7 +133,7 @@ class VehicleAddTestCase(BaseTestCase):
 
         self.session.add(self.u1)
 
-        data = server.addVehicle(self.u1.ID, "Test", "A", "BMW", u'3 серия', u'E30 [рестайлинг] Touring универсал', "316i AT", 1992)
+        data = server.addVehicle(self.u1.id, "Test", "A", "BMW", u'3 серия', u'E30 [рестайлинг] Touring универсал', "316i AT", 1992)
 
         self.assertJsonRpc(data)
         self.assertIs(type(data['result']), int)
@@ -146,7 +149,7 @@ class VehicleAddTestCase(BaseTestCase):
 
         self.session.add(self.u1)
 
-        data = server.addVehicle(self.u1.ID, "Машина", "A", "BMW", u'3 серия', u'E30 [рестайлинг] Touring универсал', "316i AT", 1992)
+        data = server.addVehicle(self.u1.id, "Машина", "A", "BMW", u'3 серия', u'E30 [рестайлинг] Touring универсал', "316i AT", 1992)
 
         self.assertJsonRpc(data)
         self.assertIs(type(data['result']), int)
@@ -166,13 +169,13 @@ class VehicleAddSTSTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "user1", "testtest")
+        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
         session.add(cls.u1)
         session.flush()
         session.refresh(cls.u1)
         session.commit()
 
-        cls.v1 = TrVehicle("v1", cls.u1.ID, car_model_id=111, year=2000)
+        cls.v1 = TrVehicle("v1", cls.u1.id, car_model_id=111, year=2000)
         v_list = [cls.v1]
         cls.v_count = len(v_list)
         session.add_all(v_list)
@@ -201,7 +204,7 @@ class VehicleAddSTSTestCase(BaseTestCase):
         self.assertIsNone(self.v1.car_sts)
         self.assertIsNone(self.v1.car_number)
 
-        data = server.addSTS(self.u1.ID, self.v1.id, "321232", "А123СТ")
+        data = server.addSTS(self.u1.id, self.v1.id, "321232", "А123СТ")
 
         self.assertJsonRpc(data)
         self.assertIs(data['result'], True)
@@ -227,13 +230,13 @@ class VehicleDeleteSTSTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "user1", "testtest")
+        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
         session.add(cls.u1)
         session.flush()
         session.refresh(cls.u1)
         session.commit()
 
-        cls.v1 = TrVehicle("v1", cls.u1.ID, car_model_id=111, year=2000)
+        cls.v1 = TrVehicle("v1", cls.u1.id, car_model_id=111, year=2000)
         v_list = [cls.v1]
         cls.v_count = len(v_list)
         session.add_all(v_list)
@@ -259,7 +262,7 @@ class VehicleDeleteSTSTestCase(BaseTestCase):
         self.session.add(self.u1)
         self.session.add(self.v1)
 
-        data = server.addSTS(self.u1.ID, self.v1.id, "111222", "Ф666МИ")
+        data = server.addSTS(self.u1.id, self.v1.id, "111222", "Ф666МИ")
 
         self.assertJsonRpc(data)
         self.assertIs(data['result'], True)
@@ -273,7 +276,7 @@ class VehicleDeleteSTSTestCase(BaseTestCase):
         self.assertEquals(v.car_number, u'Ф666МИ')
         s.close()
 
-        data = server.delSTS(self.u1.ID, self.v1.id)
+        data = server.delSTS(self.u1.id, self.v1.id)
 
         self.assertJsonRpc(data)
         self.assertIs(data['result'], True)
@@ -295,14 +298,14 @@ class VehicleDeleteTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "user_del", "testtest")
+        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
         session.add(cls.u1)
         session.flush()
         session.refresh(cls.u1)
         session.commit()
 
-        cls.v1 = TrVehicle("v1", cls.u1.ID, car_model_id=111, year=2000)
-        cls.v2 = TrVehicle("v2", cls.u1.ID, car_model_id=111, year=2000)
+        cls.v1 = TrVehicle("v1", cls.u1.id, car_model_id=111, year=2000)
+        cls.v2 = TrVehicle("v2", cls.u1.id, car_model_id=111, year=2000)
         v_list_del = [cls.v1, cls.v2]
         session.add_all(v_list_del)
         session.commit()
@@ -326,17 +329,17 @@ class VehicleDeleteTestCase(BaseTestCase):
 
         self.session.add(self.u1)
 
-        data = server.getVehicles(self.u1.ID)
+        data = server.getVehicles(self.u1.id)
 
         self.assertIn(u'result', data)
         self.assertEquals(len(data['result']), 2)
 
-        data = server.delVehicle(self.u1.ID, self.u1.vehicles[0].id)
+        data = server.delVehicle(self.u1.id, self.u1.vehicles[0].id)
 
         self.assertJsonRpc(data)
         self.assertIs(data['result'], True)
 
-        data = server.getVehicles(self.u1.ID)
+        data = server.getVehicles(self.u1.id)
 
         self.assertJsonRpc(data)
         self.assertEquals(len(data['result']), 1)
@@ -345,7 +348,7 @@ class VehicleDeleteTestCase(BaseTestCase):
 
         self.session.add(self.u1)
 
-        data = server.delVehicle(self.u1.ID, self.u1.vehicles[0].id + 1000)
+        data = server.delVehicle(self.u1.id, self.u1.vehicles[0].id + 1000)
 
         self.assertIn(u'error', data)
         self.assertEquals(data['error'][u'message'], "ServerError: Vehicle doesn't exist.")
@@ -358,7 +361,7 @@ class VehicleUpdateTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "u1", "testtest")
+        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
         user_list = [cls.u1]
         cls.user_count = len(user_list)
         session.add_all(user_list)
@@ -366,9 +369,9 @@ class VehicleUpdateTestCase(BaseTestCase):
         session.refresh(cls.u1)
         session.commit()
 
-        cls.v1 = TrVehicle("v1", cls.u1.ID, car_model_id=111, year=1989)
-        cls.v2 = TrVehicle("v2", cls.u1.ID, car_model_id=222, year=1980)
-        cls.v3 = TrVehicle("v3", cls.u1.ID, car_model_id=333, year=1980)
+        cls.v1 = TrVehicle("v1", cls.u1.id, car_model_id=111, year=1989)
+        cls.v2 = TrVehicle("v2", cls.u1.id, car_model_id=222, year=1980)
+        cls.v3 = TrVehicle("v3", cls.u1.id, car_model_id=333, year=1980)
         v_list = [cls.v1, cls.v2, cls.v3]
         cls.v_count = len(v_list)
         session.add_all(v_list)
@@ -394,7 +397,7 @@ class VehicleUpdateTestCase(BaseTestCase):
         self.session.add(self.u1)
         self.session.add(self.v1)
 
-        data = server.updateVehicle(user_id=self.u1.ID, id=self.v1.id, name="new_name",
+        data = server.updateVehicle(user_id=self.u1.id, id=self.v1.id, name="new_name",
                                     maker="Alfa Romeo", model="164", generation="1 поколение седан",
                                     modification="2.0 MT", year=1989) # car_model_id = 111
 
@@ -416,7 +419,7 @@ class VehicleUpdateTestCase(BaseTestCase):
         self.session.add(self.u1)
         self.session.add(self.v2)
 
-        data = server.updateVehicle(user_id=self.u1.ID, id=self.v2.id, name="new_name",
+        data = server.updateVehicle(user_id=self.u1.id, id=self.v2.id, name="new_name",
                                     maker="AC", model="Cobra", generation="1 поколение родстер",
                                     modification="4.9 MT", year=2000) # car_model_id = 8
 
@@ -438,7 +441,7 @@ class VehicleUpdateTestCase(BaseTestCase):
         self.session.add(self.u1)
         self.session.add(self.v3)
 
-        data = server.updateVehicle(user_id=self.u1.ID, id=self.v3.id, name="new_name",
+        data = server.updateVehicle(user_id=self.u1.id, id=self.v3.id, name="new_name",
                                     maker="AC", model="Cobra", generation="1 поколение родстер",
                                     modification="4.9 MT", year=1985)
 
