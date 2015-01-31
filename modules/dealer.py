@@ -72,7 +72,9 @@ def getDealers(user_id, vehicle_id, location, radius):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).\
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == uid).\
         filter(TrVehicle.id == vehicle_id).first()
 
     if v is None:
