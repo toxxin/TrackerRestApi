@@ -147,9 +147,12 @@ def getVehicles(user_id):
 
     session = Session()
 
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
     lst = []
 
-    vehiles = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).all()
+    # vehiles = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).all()
+    vehiles = session.query(TrVehicle).filter(TrVehicle.user_id == uid).all()
 
     for v in vehiles:
         lst.append(fillVihecleResponse(v))
@@ -165,7 +168,10 @@ def getVehicleTech(user_id, id):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    # v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == uid).filter(TrVehicle.id == id).first()
 
     if v is None:
         raise ServerError("Vehicle doesn't exist.")
@@ -194,12 +200,13 @@ def addVehicle(user_id, name, type, maker, model, generation, modification, year
     if type != 'A' and type != 'M':
         raise ServerError("Incorrect vehicle type.")
 
-    v = TrVehicle(user_id=int(current_user.get_id()), name=name, type=type, car_model_id=car.id, year=year)
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    # v = TrVehicle(user_id=int(current_user.get_id()), name=name, type=type, car_model_id=car.id, year=year)
+    v = TrVehicle(user_id=uid, name=name, type=type, car_model_id=car.id, year=year)
 
     try:
         session.add(v)
-        session.commit()
-        session.flush()
         session.commit()
         session.refresh(v)
     except:
@@ -217,7 +224,10 @@ def updateVehicle(user_id, id, name, maker, model, generation, modification, yea
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    # v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == uid).filter(TrVehicle.id == id).first()
 
     if v is None:
         session.close()
@@ -263,7 +273,10 @@ def addSTS(user_id, id, sts, number):
 
     # TODO: Add validation sts and number
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    # v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == uid).filter(TrVehicle.id == id).first()
 
     if v is None:
         session.close()
@@ -290,7 +303,10 @@ def delSTS(user_id, id):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    # v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == uid).filter(TrVehicle.id == id).first()
 
     if v is None:
         session.close()
@@ -317,7 +333,10 @@ def delVehicle(user_id, id):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    # v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == uid).filter(TrVehicle.id == id).first()
 
     if v is None:
         session.close()
@@ -489,7 +508,10 @@ def getRoadTax(user_id, vehicle_id):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    # v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).filter(TrVehicle.id == id).first()
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == uid).filter(TrVehicle.id == id).first()
 
     if v is None:
         session.close()
