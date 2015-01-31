@@ -6,7 +6,7 @@ __email__ = "ag@easywhere.ru"
 
 from flask.ext.login import login_required, current_user
 
-from TrackerRestApi import jsonrpc
+from TrackerRestApi import jsonrpc, app
 from TrackerRestApi import Session
 
 from flask_jsonrpc import ServerError
@@ -32,7 +32,9 @@ def getDevice(user_id, device_id):
 
     session = Session()
 
-    t = session.query(TrVehicle.id).filter(TrVehicle.user_id == int(current_user.get_id())).subquery('t')
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    t = session.query(TrVehicle.id).filter(TrVehicle.user_id == uid).subquery('t')
     dev = session.query(TrDevice).filter(TrDevice.id == device_id).filter(TrDevice.vehicle_id == t.c.id).first()
 
     if dev is None:
@@ -50,7 +52,9 @@ def getDevices(user_id):
 
     session = Session()
 
-    t = session.query(TrVehicle.id).filter(TrVehicle.user_id == int(current_user.get_id())).subquery('t')
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    t = session.query(TrVehicle.id).filter(TrVehicle.user_id == uid).subquery('t')
     devs = session.query(TrDevice).filter(TrDevice.vehicle_id == t.c.id).all()
 
     lst = [fillDeviceResponse(dev) for dev in devs]
@@ -66,7 +70,9 @@ def delDevice(user_id, device_id):
 
     session = Session()
 
-    t = session.query(TrVehicle.id).filter(TrVehicle.user_id == int(current_user.get_id())).subquery('t')
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    t = session.query(TrVehicle.id).filter(TrVehicle.user_id == uid).subquery('t')
     dev = session.query(TrDevice).filter(TrDevice.vehicle_id == t.c.id).filter(TrDevice.id == device_id).first()
 
     if dev is None:
@@ -92,7 +98,9 @@ def delDevice(user_id, device_id):
 #
 #     session = Session()
 #
-#     dev = session.query(TrDevice).filter(TrDevice.device_userID == int(current_user.get_id())).\
+#    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+#
+#     dev = session.query(TrDevice).filter(TrDevice.device_userID == uid).\
 #                                     filter(TrDevice.device_ID == device_id).first()
 #
 #     if dev is None:
@@ -125,7 +133,9 @@ def regDevice(user_id, vehicle_id, sn, secret_code):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).\
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == uid).\
                                     filter(TrVehicle.id == vehicle_id).first()
 
     if v is None:
@@ -167,7 +177,9 @@ def unregDevice(user_id, vehicle_id, device_id):
 
     session = Session()
 
-    v = session.query(TrVehicle).filter(TrVehicle.user_id == int(current_user.get_id())).\
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == uid).\
                                 filter(TrVehicle.id == vehicle_id).first()
 
     if v is None:
