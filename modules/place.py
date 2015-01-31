@@ -6,7 +6,7 @@ __email__ = "ag@easywhere.ru"
 
 from flask.ext.login import login_required, current_user
 
-from TrackerRestApi import jsonrpc
+from TrackerRestApi import jsonrpc, app
 from TrackerRestApi import Session
 
 from flask_jsonrpc import ServerError, InvalidParamsError
@@ -37,8 +37,11 @@ place_types = ["hotel", "restaurant", "cafe"]
 def getPlaces(user_id):
 
     session = Session()
+    
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
 
-    pls = session.query(TrPlace).filter(TrPlace.user_id == int(current_user.get_id())).all()
+
+    pls = session.query(TrPlace).filter(TrPlace.user_id == uid).all()
 
     lst = [fillPlaceResponse(p) for p in pls]
 
@@ -52,8 +55,10 @@ def getPlaces(user_id):
 def addPlace(user_id, title, longitude, latitude, type, desc):
 
     session = Session()
+    
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
 
-    p = TrPlace(user_id=int(current_user.get_id()), title=title, longitude=float(longitude), latitude=float(latitude), type=type, desc=desc)
+    p = TrPlace(user_id=uid, title=title, longitude=float(longitude), latitude=float(latitude), type=type, desc=desc)
 
     try:
         session.add(p)
@@ -73,8 +78,10 @@ def addPlace(user_id, title, longitude, latitude, type, desc):
 def delPlace(user_id, place_id):
 
     session = Session()
+    
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
 
-    p = session.query(TrPlace).filter(TrPlace.user_id == int(current_user.get_id())).filter(TrPlace.id == place_id).first()
+    p = session.query(TrPlace).filter(TrPlace.user_id == uid).filter(TrPlace.id == place_id).first()
 
     if p is None:
         session.close()
@@ -103,8 +110,10 @@ def isAllIncluded(S1, S2):
 def updatePlace(user_id, place_id, **kwargs):
 
     session = Session()
+    
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
 
-    p = session.query(TrPlace).filter(TrPlace.user_id == int(current_user.get_id())).filter(TrPlace.id == place_id).first()
+    p = session.query(TrPlace).filter(TrPlace.user_id == uid).filter(TrPlace.id == place_id).first()
 
     if p is None:
         session.close()
