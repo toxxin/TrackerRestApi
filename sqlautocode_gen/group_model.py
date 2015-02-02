@@ -9,6 +9,13 @@ from sqlalchemy.orm import relationship
 from sqlautocode_gen import DeclarativeBase
 
 
+association_table_user_group = Table('tr_user_group', DeclarativeBase.metadata,
+Column(u'id', Integer, primary_key=True),
+Column(u'user_id', Integer, ForeignKey('tr_user.id'), nullable=False),
+Column(u'group_id', Integer, ForeignKey('tr_group.id'), nullable=False)
+)
+
+
 class TrGroup(DeclarativeBase):
     __tablename__ = 'tr_group'
 
