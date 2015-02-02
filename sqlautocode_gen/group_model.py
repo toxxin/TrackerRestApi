@@ -19,14 +19,20 @@ class TrGroup(DeclarativeBase):
     title = Column(u'title', String(255), nullable=False)
     desc = Column(u'desc', String(255), nullable=False)
     pic = Column(u'pic', String(255), nullable=False)
-    type = Column(u'type', CHAR(1))
-    pic = Column(u'pic', String(20), nullable=True)
-    
+    invitation = Column(u'invitation', Boolean, nullable=False, default=False)
+    meeting = Column(u'meeting', Boolean, nullable=False, default=False)
+    help = Column(u'help', Boolean, nullable=False, default=False)
+    last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
+    creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
+
     #relation definitions
     user_id = relationship("TrUser", foreign_keys="TrUser.id", cascade="all,delete")
 
-    def __init__(self, title, link, type=None, pic=None):
+    def __init__(self, user_id, title, desc, pic=None, invitation=False, meeting=False, help=False):
         self.title = title
-        self.link = link
-        self.type = type
+        self.desc = desc
         self.pic = pic
+        self.invitation = invitation
+        self.meeting = meeting
+        self.help = help
+        self.user_id = user_id
