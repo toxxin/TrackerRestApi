@@ -40,3 +40,26 @@ def getGroups(user_id):
     lst = [fillGroupResponse(g) for g in gs]
 
     return lst
+
+
+@jsonrpc.method('addGroup(user_id=Number,title=String,desc=String,invitation=Boolean,meeting=Boolean,help=Boolean) -> Object', validate=True, authenticated=False)
+@login_required
+def addGroup(user_id, title, desc, invitation, meeting, help):
+
+    session = Session()
+
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    g = TrGroup(title=title, desc=desc, invitation=invitation, meeting=meeting, help=help)
+
+    try:
+        session.add(g)
+        session.commit()
+        session.refresh(g)
+    except:
+        session.rollback()
+        raise ServerError("Can't add group.")
+    finally:
+        session.close()
+
+    return g.id
