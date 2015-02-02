@@ -63,3 +63,29 @@ def addGroup(user_id, title, desc, invitation, meeting, help):
         session.close()
 
     return g.id
+
+
+@jsonrpc.method('delGroup(user_id=Number,id=Number) -> Object', validate=True, authenticated=False)
+@login_required
+def delGroup(user_id, id):
+
+    session = Session()
+
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    g = session.quiry(TrGroup).get(id)
+
+    if g is None:
+        session.close()
+        raise ServerError("Group doesn't exist.")
+
+    try:
+        session.delete(g)
+        session.commit()
+    except:
+        session.rollback()
+        raise ServerError("Can't delete group.")
+    finally:
+        session.close()
+
+    return True
