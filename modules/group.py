@@ -141,3 +141,20 @@ def delGroup(user_id, id):
         session.close()
 
     return True
+
+
+@jsonrpc.method('getAccList(user_id=Number,list=String) -> Object', validate=True, authenticated=False)
+@login_required
+def getAccList(user_id, list):
+
+    session = Session()
+
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    us = session.quiry(TrUser).filter(TrUser.login.in_(list.split(','))).all()
+
+    lst = [u.login for u in us]
+
+    session.close()
+
+    return lst
