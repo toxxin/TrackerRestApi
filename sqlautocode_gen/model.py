@@ -34,6 +34,8 @@ class TrUser(DeclarativeBase):
 
     places = relationship("TrPlace", foreign_keys="TrPlace.user_id", cascade="all,delete")
 
+    groups = relationship("TrGroup", foreign_keys="TrGroup.user_id", cascade="all,delete")
+
     def is_authenticated(self):
         return self.authenticated
 
