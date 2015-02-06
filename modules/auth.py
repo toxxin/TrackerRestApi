@@ -232,6 +232,30 @@ class SmsEpochta(SmsProvider):
     #     print result
 
 
+@jsonrpc.method('getProfile(user_id=Number) -> Any', validate=True, authenticated=False)
+@login_required
+def getProfile(user_id):
+
+    session = Session()
+
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    u = session.query(TrUser).get(uid)
+
+    if u is None:
+        session.close()
+        raise ServerError("User doesn't exist.")
+
+    ret = {
+        "login": u.login,
+        "pic": app.config.get('PROFILE_IMG_URL') + u.pic if u.pic is not None else u.pic
+    }
+
+    session.close()
+
+    return ret
+
+
 @app.route('/test', methods=['POST', 'GET'])
 @login_required
 def test():
