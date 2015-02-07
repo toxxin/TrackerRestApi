@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+
 __author__ = 'Anton Glukhov'
+__copyright__ = "Copyright 2014, Easywhere"
+__email__ = "ag@easywhere.ru"
 
 import unittest
 from base import BaseTestCase
