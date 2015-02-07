@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
+
 __author__ = 'Anton Glukhov'
+__copyright__ = "Copyright 2014, Easywhere"
+__email__ = "ag@easywhere.ru"
 
 import unittest
 from base import BaseTestCase
 from sqlautocode_gen.model import *
-from sqlautocode_gen.tbl_02_models import *
 from tests.run import Session, server
 
 
