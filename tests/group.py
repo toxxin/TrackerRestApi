@@ -201,6 +201,71 @@ class GroupGetTestCase(BaseTestCase):
         self.assertEquals(data['result'][1]['admin'], True)
 
 
+class GroupDeleteTestCase(BaseTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+
+        session = Session()
+
+        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)  # one own group
+        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)  # two own groups
+        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)  # in one group
+        cls.u4 = TrUser(login="44444", auth_code="4444", authenticated=True)  # in two groups
+        cls.u5 = TrUser(login="55555", auth_code="5555", authenticated=True)  # no any groups
+        u_list = [cls.u1, cls.u2, cls.u3, cls.u4, cls.u5]
+        cls.user_count = len(u_list)
+        session.add_all(u_list)
+        session.flush()
+        session.refresh(cls.u1)
+        session.refresh(cls.u2)
+        session.refresh(cls.u3)
+        session.refresh(cls.u4)
+        session.refresh(cls.u5)
+        session.commit()
+
+        cls.g1 = TrGroup(user_id=cls.u1.id, title="g1")
+        cls.g2 = TrGroup(user_id=cls.u2.id, title="g2")
+        cls.g3 = TrGroup(user_id=cls.u2.id, title="g3")
+        g_list = [cls.g1, cls.g2, cls.g3]
+        cls.group_count = len(g_list)
+        session.add_all(g_list)
+        session.commit()
+
+        # Add users to groups
+        cls.g1.users.append(cls.u3)
+        cls.g1.users.append(cls.u4)
+        cls.g2.users.append(cls.u4)
+        session.add_all([cls.g1, cls.g2])
+        session.commit()
+
+        session.close()
+
+    @classmethod
+    def tearDownClass(cls):
+
+        session = Session()
+
+        users = session.query(TrUser).all()
+        map(session.delete, users)
+
+        groups = session.query(TrGroup).all()
+        map(session.delete, groups)
+
+        session.close()
+
+
+    def test_delete_one_own_group(self):
+
+        self.session.add(self.u1)
+        self.session.add(self.g1)
+
+        data = server.delGroup(self.u1.id, self.g1.id)
+
+        self.assertJsonRpc(data)
+        self.assertIs(data['result'], True)
+
+
 def suite():
 
     loader = unittest.TestLoader()
@@ -208,6 +273,7 @@ def suite():
 
     suite.addTests(loader.loadTestsFromTestCase(GroupBaseTestCase))
     suite.addTests(loader.loadTestsFromTestCase(GroupGetTestCase))
+    suite.addTests(loader.loadTestsFromTestCase(GroupDeleteTestCase))
 
     return suite
 
