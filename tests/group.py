@@ -65,6 +65,8 @@ class GroupBaseTestCase(BaseTestCase):
 
         groups = session.query(TrGroup).all()
         map(session.delete, groups)
+        
+        session.commit()
 
         session.close()
 
@@ -139,6 +141,8 @@ class GroupGetTestCase(BaseTestCase):
 
         groups = session.query(TrGroup).all()
         map(session.delete, groups)
+        
+        session.commit()
 
         session.close()
 
@@ -252,6 +256,8 @@ class GroupDeleteTestCase(BaseTestCase):
         groups = session.query(TrGroup).all()
         map(session.delete, groups)
 
+        session.commit()
+
         session.close()
 
 
@@ -264,6 +270,22 @@ class GroupDeleteTestCase(BaseTestCase):
 
         self.assertJsonRpc(data)
         self.assertIs(data['result'], True)
+
+        """ Separate session, cause cross-session's transaction collision """
+        s = Session()
+        g = s.query(TrGroup).get(self.g1.id)
+        self.assertIsNone(g)
+        s.close()
+
+    def test_delete_incorrect_group(self):
+
+        self.session.add(self.u1)
+        self.session.add(self.g1)
+
+        data = server.delGroup(self.u1.id, self.g1.id + 1000)
+
+        self.assertJsonRpcErr(data)
+        self.assertEquals(data['error'][u'message'], "ServerError: Group doesn't exist.")
 
 
 def suite():
