@@ -205,6 +205,62 @@ class GroupGetTestCase(BaseTestCase):
         self.assertEquals(data['result'][1]['admin'], True)
 
 
+class GroupAddTestCase(BaseTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+
+        session = Session()
+
+        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
+        u_list = [cls.u1, cls.u2]
+        cls.user_count = len(u_list)
+        session.add_all(u_list)
+        session.flush()
+        session.refresh(cls.u1)
+        session.refresh(cls.u2)
+        session.commit()
+
+        cls.g1 = TrGroup(user_id=cls.u1.id, title="g1")
+        cls.g2 = TrGroup(user_id=cls.u2.id, title="g2")
+        g_list = [cls.g1, cls.g2]
+        cls.group_count = len(g_list)
+        session.add_all(g_list)
+        session.commit()
+
+        # Add users to groups
+        cls.g2.users.append(cls.u1)
+        session.add_all([cls.g2])
+        session.commit()
+
+        session.close()
+
+    @classmethod
+    def tearDownClass(cls):
+
+        session = Session()
+
+        users = session.query(TrUser).all()
+        map(session.delete, users)
+
+        groups = session.query(TrGroup).all()
+        map(session.delete, groups)
+
+        session.commit()
+
+        session.close()
+
+    def test_add_group(self):
+    
+        self.session.add(self.u1)
+
+        data = server.addGroup(self.u1.id, "group", "desc", true, false, false)
+
+        self.assertJsonRpc(data)
+        self.assertIs(data['result'], True)
+
+
 class GroupDeleteTestCase(BaseTestCase):
 
     @classmethod
