@@ -259,6 +259,17 @@ class GroupAddTestCase(BaseTestCase):
 
         self.assertJsonRpc(data)
         self.assertIs(data['result'], True)
+        
+
+    def test_add_group_no_desc(self):
+
+        self.session.add(self.u1)
+        
+        data = server.addGroup(self.u1.id, "group", None, true, false, false)
+        
+        self.assertJsonRpc(data)
+        self.assertIs(type(data['result'], True)
+
 
 
 class GroupDeleteTestCase(BaseTestCase):
@@ -351,6 +362,7 @@ def suite():
 
     suite.addTests(loader.loadTestsFromTestCase(GroupBaseTestCase))
     suite.addTests(loader.loadTestsFromTestCase(GroupGetTestCase))
+    suite.addTests(loader.loadTestsFromTestCase(GroupAddTestCase))
     suite.addTests(loader.loadTestsFromTestCase(GroupDeleteTestCase))
 
     return suite
