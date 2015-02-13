@@ -77,8 +77,3 @@ def upload(target):
     else:
         session.close()
         return "Error: incorrect file."
-
-
-@app.route('/test1', methods=['POST', 'GET'])
-def test1():
-    return 'Test'
