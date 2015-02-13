@@ -1,4 +1,8 @@
+# -*- coding: utf-8 -*-
+
 __author__ = 'Anton Glukhov'
+__copyright__ = "Copyright 2014, Easywhere"
+__email__ = "ag@easywhere.ru"
 
 import os
 
@@ -12,36 +16,44 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ['jpg', 'jpeg']
 
-@app.route('/upload', methods=['POST'])
-def upload():
+@app.route('/upload/<target>', methods=['POST'])
+def upload(target):
 
     session = Session()
 
-    file = request.files['file']
-    vehicle_id = request.headers.get('vehicle_id')
+    tbl = {'profile': (TrUser, app.config.get('PROFILES_IMG_PATH')),
+           'vehicle': (TrVehicle, app.config.get('VEHICLES_IMG_PATH')),
+           'group': (TrGroup, app.config.get('GROUPS_IMG_PATH'))}
 
-    print "Vehicle id: %d" % vehicle_id
-    print "Filename: %s" % file.filename
-
-    v = session.query(TrVehicle).get(vehicle_id)
-
-    if v is None:
+    if tbl.get(target) is None:
         session.close()
-        return ("Error: Vehicle doesn't exist.")
+        return ("Error: Incorrect target.")
 
-    if v.pic is not None:
-        try:
-            os.remove(app.config.get('VEHICLES_IMG_PATH') + '/' + v.pic)
-        except:
-            pass
+    obj = session.query(tbl[target][0]).get(int(request.headers.get('id')))
+    if obj is None:
+        session.close()
+        return ("Error: Object doesn't exist.")
+
+    path = tbl[target][1]
+
+    file = request.files['file']
+
+    app.logger.debug('Object id: %d' % int(request.headers.get('id')))
+    app.logger.debug('Filename: %s' % file.filename)
 
     if file and allowed_file(file.filename):
-        # Make the filename safe, remove unsupported chars
-        filename = secure_filename(file.filename)
+
+        if obj.pic is not None:
+            app.logger.debug('Field pic is not empty.')
+            try:
+                app.logger.debug('Trying to delete old file.')
+                os.remove(path + obj.pic)
+            except:
+                pass
 
         engine.execute(" \
-            UPDATE tr_vehicle SET pic=concat( \
-                  substring('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', rand(@seed:=round(rand(" + str(v.id) + ")*4294967296))*62+1, 1), \
+            UPDATE " + obj.__tablename__ + " SET pic=concat( \
+                  substring('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', rand(@seed:=round(rand(" + str(obj.id) + ")*4294967296))*62+1, 1), \
                   substring('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', rand(@seed:=round(rand(@seed)*4294967296))*62+1, 1), \
                   substring('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', rand(@seed:=round(rand(@seed)*4294967296))*62+1, 1), \
                   substring('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', rand(@seed:=round(rand(@seed)*4294967296))*62+1, 1), \
@@ -51,24 +63,17 @@ def upload():
                   substring('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', rand(@seed)*62+1, 1), \
                   '.jpg' \
                  ) \
-            WHERE id="+ str(v.id) + "; \
+            WHERE id="+ str(obj.id) + "; \
         ")
 
-        session.refresh(v)
+        session.close()
 
-        file.save(os.path.join(app.config.get('VEHICLES_IMG_PATH'), v.pic + ".jpg"))
+        s = Session()
+        ob = session.query(tbl[target][0]).get(int(request.headers.get('id')))
+        file.save(os.path.join(path, ob.pic))
+        s.close()
 
-        # try:
-        #     v.pic = "new_file"
-        #     session.merge(v)
-        #     session.commit()
-        # except:
-        #     session.rollback()
-        #     raise ServerError("Can't upload")
-        # finally:
-        #     session.close()
-
-        return "Vehicle pic"
+        return "Ok"
     else:
         session.close()
         return "Error: incorrect file."
