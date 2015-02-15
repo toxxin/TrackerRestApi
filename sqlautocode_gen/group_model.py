@@ -44,3 +44,20 @@ class TrGroup(DeclarativeBase):
         self.meeting = meeting
         self.help = help
         self.user_id = user_id
+
+
+class TrGroupComment(DeclarativeBase):
+    __tablename__ = 'tr_group_comment'
+
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+    
+    #colomn definition
+    id = Column(u'id', Integer, primary_key=True)
+    message = Column(u'message', UnicodeText, nullable=False)
+    last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
+    creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
+    user_group_id = Column(u'user_group_id', Integer, ForeignKey('tr_user_group.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+
+    def __init__(self, message, user_group_id):
+        self.message = message
+        self.user_group_id = user_group_id
