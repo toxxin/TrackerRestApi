@@ -21,3 +21,6 @@ group_option_params = ["desc", "invitation", "meeting", "help"]
 GEO_SHAPE_CIRCUS = 0
 GEO_SHAPE_SQUARE = 1
 GEO_SHAPE_RANDOM = 2
+
+PUSH_USER = 0
+PUSH_VEHICLE = 1
