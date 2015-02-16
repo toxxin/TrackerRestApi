@@ -162,4 +162,26 @@ def getAccList(user_id, list):
 @login_required
 def addComment(user_id, group_id, message):
 
-    #TODO: add code here
+    session = Session()
+
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+    
+    t = session.quiry(association_table_user_group).filter(association_table_user_group.user_id == uid).\
+                                                    filter(association_table_user_group.group_id == id).first()
+    if t is None:
+        session.close()
+        raise ServerError("Group doesn't exist.")
+
+    m = TrGroupComment(message=message, user_group_id=t.id)
+
+    try:
+        session.add(m)
+        session.commit()
+        session.refresh(m)
+    except:
+        session.rollback()
+        raise ServerError("Can't add message.")
+    finally:
+        session.close()
+        
+    return m.id
