@@ -158,6 +158,12 @@ def getAccList(user_id, list):
     return lst
     
     
+@jsonrpc.method('getComments(user_id=Number,group_id=Number) -> Object', validate=True, authenticated=False)
+@login_required
+def getComments(user_id, group_id):
+    #TODO: code here
+    
+    
 @jsonrpc.method('addComment(user_id=Number,group_id=Number,message=String) -> Object', validate=True, authenticated=False)
 @login_required
 def addComment(user_id, group_id, message):
