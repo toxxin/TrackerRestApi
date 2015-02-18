@@ -214,3 +214,32 @@ def addComment(user_id, group_id, message):
         session.close()
         
     return m.id
+    
+    
+@jsonrpc.method('delComment(user_id=Number,group_id=Number,id=Number) -> Object', validate=True, authenticated=False)
+@login_required
+def delComment(user_id, group_id, id):
+
+    session = Session()
+    
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+    
+    t = session.query(association_table_user_group).filter(association_table_user_group.user_id == uid).\
+                                                    filter(association_table_user_group.group_id == group_id).subquery('t')
+    m = session.query(TrGroupComment).filter(TrGroupComment.user_group_id == t.c.id).\
+                                        filter(TrGroupComment.id == id).first()
+
+    if m is None:
+        session.close()
+        raise ServerError("Message doesn't exist.")
+
+    try:
+        session.delete(m)
+        session.commit()
+    except:
+        session.rollback()
+        raise ServerError("Can't delete message.")
+    finally:
+        session.close()
+
+    return True
