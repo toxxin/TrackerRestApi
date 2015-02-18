@@ -156,12 +156,35 @@ def getAccList(user_id, list):
     session.close()
 
     return lst
-    
+
+
+def fillGroupMessageResponse(m):
+
+    ret = {
+        "id": m.id,
+        "date": m.creation_date,
+        "message": m.message,
+    }
+
+    return ret
     
 @jsonrpc.method('getComments(user_id=Number,group_id=Number) -> Object', validate=True, authenticated=False)
 @login_required
 def getComments(user_id, group_id):
-    #TODO: code here
+
+    session = Session()
+    
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    t = session.query(association_table_user_group).filter(association_table_user_group.user_id == uid).\
+                                                    filter(association_table_user_group.group_id == group_id).subquery('t')
+    ms = session.query(TrGroupComment).filter(TrGroupComment.user_group_id == t.c.id).all()
+
+    lst = [fillGroupMessageResponse(m) for m in ms]
+    
+    session.close()
+    
+    return lst
     
     
 @jsonrpc.method('addComment(user_id=Number,group_id=Number,message=String) -> Object', validate=True, authenticated=False)
