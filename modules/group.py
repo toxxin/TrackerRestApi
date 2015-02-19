@@ -186,7 +186,7 @@ def getComments(user_id, group_id):
                                                     filter(association_table_user_group.group_id == group_id).subquery('t')
     ms = session.query(TrGroupComment).filter(TrGroupComment.user_group_id == t.c.id).all()
 
-    lst = [fillGroupMessageResponse(m) for m in ms]
+    lst = [fillGroupMessageResponse(m, current_user) for m in ms]
     
     session.close()
     
