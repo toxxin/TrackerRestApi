@@ -164,6 +164,12 @@ def fillGroupMessageResponse(m):
         "id": m.id,
         "date": m.creation_date,
         "message": m.message,
+        "user":
+            {
+                "id": u.id,
+                "login": u.login,
+                "pic": app.config.get('PROFILE_IMG_URL') + u.pic if u.pic is not None else u.pic
+            }
     }
 
     return ret
