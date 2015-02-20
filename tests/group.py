@@ -355,6 +355,13 @@ class GroupDeleteTestCase(BaseTestCase):
         self.assertEquals(data['error'][u'message'], "ServerError: Group doesn't exist.")
 
 
+class GroupMessageAddTestCase(BaseTestCase):
+    #TODO: source here
+    
+class GroupMessageDeleteCase(BaseTestCase):
+    #TODO: source here
+    
+
 def suite():
 
     loader = unittest.TestLoader()
