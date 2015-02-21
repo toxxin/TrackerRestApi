@@ -141,6 +141,17 @@ def delGroup(user_id, id):
     return True
 
 
+def fillUser(u):
+    
+    ret = {
+        "id": u.id,
+        "login": u.login,
+        "pic": app.config.get('PROFILE_IMG_URL') + u.pic if u.pic is not None else u.pic,
+    }
+
+    return ret
+    
+
 @jsonrpc.method('getAccList(user_id=Number,list=String) -> Object', validate=True, authenticated=False)
 @login_required
 def getAccList(user_id, list):
@@ -151,7 +162,7 @@ def getAccList(user_id, list):
 
     us = session.quiry(TrUser).filter(TrUser.login.in_(list.split(','))).all()
 
-    lst = [u.login for u in us]
+    lst = [fillUser(u) for u in us]
 
     session.close()
 
@@ -164,12 +175,7 @@ def fillGroupMessageResponse(m):
         "id": m.id,
         "date": m.creation_date,
         "message": m.message,
-        "user":
-            {
-                "id": u.id,
-                "login": u.login,
-                "pic": app.config.get('PROFILE_IMG_URL') + u.pic if u.pic is not None else u.pic
-            }
+        "user": fillUser(u),
     }
 
     return ret
