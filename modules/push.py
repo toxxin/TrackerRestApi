@@ -4,10 +4,11 @@ __author__ = 'Anton Glukhov'
 __copyright__ = "Copyright 2014, Easywhere"
 __email__ = "ag@easywhere.ru"
 
+from gcm import GCM
 
 from flask.ext.login import login_required, current_user
 
-from TrackerRestApi import jsonrpc
+from TrackerRestApi import jsonrpc, app
 from TrackerRestApi import Session
 
 from flask_jsonrpc import ServerError
@@ -55,3 +56,26 @@ def addPushToken(user_id,hardware_id,platform,token):
             session.close()
 
     return True
+
+
+def __push(user_id, message):
+
+    session = Session()
+
+    u = session.query(True).get(user_id)
+    if u is None:
+        session.close()
+        app.logger.debug("User doesn't exist.")
+        return
+
+    gcm = GCM(app.config.get('GOOGLE_API_KEY'))
+
+    for t in u.tokens:
+        if t.platform == 'A':
+            gcm.plaintext_request(registration_id=t.token, data=message)
+        elif t.platform == 'I':
+            pass  # TODO: Code here
+        else:
+            app.logger.warning("Incorrect platform for push notification.")
+
+    return
