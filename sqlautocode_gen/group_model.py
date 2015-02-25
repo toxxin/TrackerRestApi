@@ -35,6 +35,8 @@ class TrGroup(DeclarativeBase):
 
     #relation definitions
     users = relationship("TrUser", secondary=association_table_user_group)
+    
+    meetings = relationship("TrGroupMeeting", foreign_keys="TrGroupMeeting.group_id", cascade="all,delete")
 
     def __init__(self, user_id, title, desc=None, pic="Default", invitation=False, meeting=False, help=False):
         self.title = title
@@ -61,3 +63,17 @@ class TrGroupComment(DeclarativeBase):
     def __init__(self, message, user_group_id):
         self.message = message
         self.user_group_id = user_group_id
+
+
+class TrGroupMeeting(DeclarativeBase):
+    __tablename__ = 'tr_group_meeting'
+
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+    
+    #colomn definition
+    id = Column(u'id', Integer, primary_key=True)
+    title = Column(u'title', String(255), nullable=False)
+    last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
+    creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
+    time = Column(u'creation_date', TIMESTAMP(), nullable=False)
+    group_id = Column(u'group_id', Integer, ForeignKey('tr_group.id'), nullable=False)
