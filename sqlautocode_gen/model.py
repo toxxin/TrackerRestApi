@@ -314,6 +314,23 @@ class TrRegion(DeclarativeBase):
         self.region_ids = region_ids
 
 
+class Tr_vehicle_tax(DeclarativeBase):
+    __tablename__ = 'tr_vehicle_tax'
+
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
+    #colomn definition
+    id = Column(u'id', Integer, primary_key=True)
+    tax = Column('tax', UnicodeText, nullable=False)
+    last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
+    creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
+    region_id = Column(u'region_id', Integer, ForeignKey('tr_region.id'), nullable=False)
+
+    def __init__ (self, tax, region_id):
+        self.title = tax
+        self.region_id = region_id
+
+
 # try:
 #     TrFGeozone.__table__.drop(engine)
 # except:
