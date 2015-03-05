@@ -297,6 +297,23 @@ class TrPlace(DeclarativeBase):
         self.user_id = user_id
 
 
+class TrRegion(DeclarativeBase):
+    __tablename__ = 'tr_region'
+
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
+    #colomn definition
+    id = Column(u'id', Integer, primary_key=True)
+    title = Column(u'title', String(255), nullable=False)
+    region_ids = Column(u'region_ids', String(255), nullable=False)
+    last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
+    creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
+
+    def __init__ (self, title, region_ids):
+        self.title = title
+        region_ids = region_ids
+
+
 # try:
 #     TrFGeozone.__table__.drop(engine)
 # except:
