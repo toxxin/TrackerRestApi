@@ -311,7 +311,7 @@ class TrRegion(DeclarativeBase):
 
     def __init__ (self, title, region_ids):
         self.title = title
-        region_ids = region_ids
+        self.region_ids = region_ids
 
 
 # try:
