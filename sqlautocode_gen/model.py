@@ -314,7 +314,7 @@ class TrRegion(DeclarativeBase):
         self.region_ids = region_ids
 
 
-class Tr_vehicle_tax(DeclarativeBase):
+class TrVehicleTax(DeclarativeBase):
     __tablename__ = 'tr_vehicle_tax'
 
     __table_args__ = {'mysql_engine': 'InnoDB'}
