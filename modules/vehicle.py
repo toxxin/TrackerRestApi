@@ -368,6 +368,15 @@ def delVehicle(user_id, id):
     return True
 
 
+def __getLogoLink(marka):
+    try:
+        if os.path.isfile(app.config.get('MAKERS_IMG_PATH') + marka.lower() + ".png"):
+            return app.config.get('MAKERS_IMG_URL') + marka.lower().replace(" ", "_") + ".png"
+        else:
+            return None
+    except:
+        return None
+
 @jsonrpc.method('getMakers(user_id=Number, type=String) -> Object', validate=True, authenticated=False)
 @login_required
 def getMakers(user_id, type):
@@ -376,7 +385,7 @@ def getMakers(user_id, type):
 
     makers = session.query(TrAvtoDGGR.marka_name, TrAvtoDGGR.logo).distinct(TrAvtoDGGR.marka_name).order_by(TrAvtoDGGR.marka_name).all()
 
-    lst = [{"maker": m.marka_name, "logo": m.logo} for m in makers]
+    lst = [{"maker": m.marka_name, "logo": __getLogoLink(m.marka_name)} for m in makers]
 
     session.close()
 
