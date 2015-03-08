@@ -75,5 +75,5 @@ class TrGroupMeeting(DeclarativeBase):
     title = Column(u'title', String(255), nullable=False)
     last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
     creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
-    time = Column(u'creation_date', TIMESTAMP(), nullable=False)
+    time = Column(u'time', TIMESTAMP(), nullable=False)
     group_id = Column(u'group_id', Integer, ForeignKey('tr_group.id'), nullable=False)
