@@ -15,32 +15,47 @@ from sqlautocode_gen.model import *
 from sqlautocode_gen.group_model import TrGroup, TrGroupComment, association_table_user_group
 
 
-def __getTaxByPower(region_id, power, year):
+def __doCalcTax(region, power, year):
 
     session = Session()
 
-    tx = session.query(TrVehicleTax).filter(TrVehicleTax.id == region_id).first()
+    regs = session.query(TrRegion).all()
+    for r in regs:
+        if region in r.region_ids.split(","):
+            reg = r.title
+            r_id = r.id
+            break
+
+    tx = session.query(TrVehicleTax).filter(TrVehicleTax.region_id == r_id).first()
 
     if tx is None:
         return None
 
-    #TODO: add tax parse and calcucation
-
     session.close()
 
-    return
+    return 1800, reg
 
 
-@jsonrpc.method('getTax(user_id=Number,vehicle_id=Number) -> Any', validate=True, authenticated=False)
+@jsonrpc.method('getRoadTax(user_id=Number, vehicle_id=Number)', validate=True, authenticated=False)
 @login_required
-def getTax(user_id, vehicle_id):
+def getRoadTax(user_id, vehicle_id):
 
     session = Session()
 
     uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
 
-    #TODO: add tax logic
+    v = session.query(TrVehicle).filter(TrVehicle.user_id == uid).filter(TrVehicle.id == id).first()
+
+    if v is None:
+        session.close()
+        raise ServerError("Vehicle doesn't exist.")
+
+    if v.car_number is None:
+        session.close()
+        raise ServerError("Car number must be set.")
+
+    tax, reg = __doCalcTax(int(v.car_number[6:]), v.car_model.engine_power, v.year)
 
     session.close()
 
-    return
+    return {"vehicle_id": vehicle_id, "tax": tax, "region": reg}
