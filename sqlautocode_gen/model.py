@@ -212,7 +212,7 @@ class TrPushToken(DeclarativeBase):
 
     #colomn definition
     id = Column(u'id', Integer, primary_key=True)
-    hardware_id = Column(u'hardware_id', String(40), nullable=False)
+    hardware_id = Column(u'hardware_id', Text(4096), nullable=False, unique=True)
     platform = Column(u'platform', CHAR(length=1), nullable=False)
     token = Column(u'token', Text(4096), nullable=False)
     creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
