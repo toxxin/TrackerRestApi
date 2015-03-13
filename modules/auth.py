@@ -54,6 +54,10 @@ def getCode(number):
 def login(id, code):
 
     s = Session()
+    
+    if platform not in ["A", "a", "I", "i"]:
+        s.close()
+        raise ServerError("Incorrect platform.")
 
     u = s.query(TrUser).filter(TrUser.id == id).first()
 
