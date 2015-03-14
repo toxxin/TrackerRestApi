@@ -6,8 +6,9 @@ __email__ = "ag@easywhere.ru"
 
 import unittest
 from base import BaseTestCase
-from sqlautocode_gen.model import *
-from sqlautocode_gen.avto_dggr_model import *
+from sqlautocode_gen.model import TrUser, TrVehicle, TrDevice
+from sqlautocode_gen.place_model import TrPlace
+from sqlautocode_gen.avto_dggr_model import TrAvtoDGGR
 from tests.run import Session, server
 
 
