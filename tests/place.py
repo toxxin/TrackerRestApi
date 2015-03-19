@@ -26,9 +26,9 @@ class PlaceBaseTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
-        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
-        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
 
         user_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(user_list)
@@ -78,9 +78,9 @@ class PlaceGetTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
-        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
-        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
 
         user_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(user_list)
@@ -154,9 +154,9 @@ class PlaceAddTestCase(BaseTestCase):
     def setUpClass(cls):
 
         session = Session()
-        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
-        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
-        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
         user_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(user_list)
         session.add_all(user_list)
@@ -232,9 +232,9 @@ class PlaceDeleteTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
-        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
-        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
 
         user_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(user_list)
@@ -299,9 +299,9 @@ class PlaceUpdateTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
-        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
-        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
 
         user_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(user_list)

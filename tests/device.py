@@ -27,9 +27,9 @@ class DeviceBaseTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
-        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
-        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
         u_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(u_list)
         session.add_all(u_list)
@@ -128,9 +128,9 @@ class DeviceGetTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
-        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
-        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
         u_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(u_list)
         session.add_all(u_list)
@@ -203,9 +203,9 @@ class DeviceDeleteTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
-        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
-        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
         u_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(u_list)
         session.add_all(u_list)
@@ -323,9 +323,9 @@ class DeviceRegistrationTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
-        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
-        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
         u_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(u_list)
         session.add_all(u_list)
@@ -441,9 +441,9 @@ class DeviceUnRegistrationTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser(login="11111", auth_code="1111", authenticated=True)
-        cls.u2 = TrUser(login="22222", auth_code="2222", authenticated=True)
-        cls.u3 = TrUser(login="33333", auth_code="3333", authenticated=True)
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
         u_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(u_list)
         session.add_all(u_list)
