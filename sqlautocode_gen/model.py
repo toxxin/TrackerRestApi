@@ -25,6 +25,7 @@ class TrUser(DeclarativeBase):
     creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
     token = Column(u'token', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
     session = Column(u'session', VARCHAR(length=255, collation=u'utf8_unicode_ci'))
+    type = Column(u'type', VARCHAR(length=45, collation=u'utf8_unicode_ci'), nullable=False)
 
     vehicles = relationship("TrVehicle", foreign_keys="TrVehicle.user_id", cascade="all,delete")
 
@@ -52,13 +53,14 @@ class TrUser(DeclarativeBase):
     def get_auth_token(self):
         return make_secure_token("123456")
 
-    def __init__(self, login, auth_code, active='Y', authenticated=False, token=None, session=None):
+    def __init__(self, login, auth_code, type, active='Y', authenticated=False, token=None, session=None):
         self.login = login
         self.authenticated = authenticated
         self.auth_code = auth_code
         self.active = active
         self.token = token
         self.session = session
+        self.type = type
 
 
 class TrVehicle(DeclarativeBase):
