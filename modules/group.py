@@ -160,7 +160,7 @@ def getAccList(user_id, list):
 
     uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
 
-    us = session.quiry(TrUser).filter(TrUser.login.in_(list.split(','))).all()
+    us = session.query(TrUser).filter(TrUser.login.in_(list.split(','))).all()
 
     lst = [fillUser(u) for u in us]
 
