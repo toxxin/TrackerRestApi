@@ -79,10 +79,10 @@ def login(id, code):
         login_user(u)
 
     """Save token for push notification"""
-    pt = s.query(TrPushToken).filter(TrPushToken.platform == platform.uppercase()).\
+    pt = s.query(TrPushToken).filter(TrPushToken.platform == platform.upper()).\
                                 filter(TrPushToken.hardware_id == hw_id).first()
     if pt is None:
-        pt = TrPushToken(hw_id, platform.uppercase(), reg_id, id)
+        pt = TrPushToken(hw_id, platform.upper(), reg_id, id)
         s.add(pt)
         s.commit()
     else:
