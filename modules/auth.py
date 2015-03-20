@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 
 from flask.ext.jsonrpc import ServerError
 from flask.ext.login import login_user, login_required, logout_user, current_user
-from sqlautocode_gen.model import TrUser
+from sqlautocode_gen.model import TrUser, TrPushToken
 
 from TrackerRestApi import jsonrpc, app
 from TrackerRestApi import Session
