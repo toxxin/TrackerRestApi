@@ -217,6 +217,7 @@ class TrPushToken(DeclarativeBase):
     hardware_id = Column(u'hardware_id', String(255), nullable=False, unique=True)
     platform = Column(u'platform', CHAR(length=1), nullable=False)
     token = Column(u'token', Text(4096), nullable=False)
+    last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
     creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
     user_id = Column(u'user_id', Integer, ForeignKey('tr_user.id'), nullable=False)
 
