@@ -10,6 +10,9 @@ import urllib2, urllib
 import datetime
 import xml.etree.ElementTree as ET
 
+import facebook
+import twitter
+
 from flask.ext.jsonrpc import ServerError
 from flask.ext.login import login_user, login_required, logout_user, current_user
 from sqlautocode_gen.model import TrUser, TrPushToken
@@ -50,14 +53,13 @@ def getCode(number):
     return u.id
 
 
-@jsonrpc.method('login(id=Number, code=String) -> Object', validate=True, authenticated=False)
-def login(id, code):
+@jsonrpc.method('login(id=Number, code=String, platform=String, hw_id=String, reg_id=String) -> Object', validate=True, authenticated=False)
+def login(id, code, platform, hw_id, reg_id):
+
+    if platform not in ["A", "a", "I", "i"]:
+        raise ServerError("Incorrect platform.")
 
     s = Session()
-    
-    if platform not in ["A", "a", "I", "i"]:
-        s.close()
-        raise ServerError("Incorrect platform.")
 
     u = s.query(TrUser).filter(TrUser.id == id).first()
 
@@ -95,6 +97,93 @@ def login(id, code):
     s.close()
 
     return True
+
+
+def __authUser(s, login, type, platform, hw_id, reg_id):
+
+    print "Auth user"
+    u = s.query(TrUser).filter(TrUser.login == login).filter(TrUser.type == type).first()
+    if u is None:
+        """ Create new user """
+        print "Add new user"
+        u = TrUser(login=login, type=type, auth_code="9999", authenticated=True)
+        try:
+            s.add(u)
+            s.flush()
+            s.refresh(u)
+            pt = s.query(TrPushToken).filter(TrPushToken.hardware_id == hw_id).filter(TrPushToken.platform == platform.upper()).first()
+            if pt is None:
+                pt = TrPushToken(hardware_id=hw_id, platform=platform, token=reg_id, user_id=u.id)
+                s.add(pt)
+            else:
+                setattr(pt, 'token', reg_id)
+                setattr(pt, 'user_id', u.id)
+                s.merge(pt)
+            s.commit()
+        except:
+            s.rollback()
+            raise Exception("Can't add new user.")
+    else:
+        """ Update existed user """
+        print "user exists"
+        pt = s.query(TrPushToken).filter(TrPushToken.hardware_id == hw_id).filter(TrPushToken.platform == platform.upper()).first()
+        try:
+            if pt is None:
+                pt = TrPushToken(hardware_id=hw_id, platform=platform, token=reg_id, user_id=u.id)
+                s.add(pt)
+            else:
+                setattr(pt, 'token', reg_id)
+                setattr(pt, 'user_id', u.id)
+                s.merge(pt)
+            s.commit()
+        except:
+            s.rollback()
+            raise Exception("Can't update user data.")
+
+    login_user(u)
+    return u.id
+
+
+@jsonrpc.method('login_soc(type=String, tkn=String, tkn_secret=String, platform=String, hw_id=String, reg_id=String) -> Object', validate=True, authenticated=False)
+def login_soc(type, tkn, tkn_secret, platform, hw_id, reg_id):
+
+    if platform not in ["A", "a", "I", "i"]:
+        raise ServerError("Incorrect platform.")
+
+    s = Session()
+
+    if type.lower() == "fb":
+        graph = facebook.GraphAPI(tkn)
+        try:
+            profile = graph.get_object("me")
+            print profile
+            login = "fb_" + profile['id']
+        except:
+            s.close()
+            raise ServerError("Incorrect credentials.")
+    elif type.lower() == "tw":
+        try:
+            tw = twitter.Api(consumer_key=app.config.get('TWITTER_CONSUMER_KEY'),
+                          consumer_secret=app.config.get('TWITTER_CONSUMER_SECRET'),
+                          access_token_key=tkn,
+                          access_token_secret=tkn_secret)
+            prof = tw.VerifyCredentials()
+            login = "tw_" + str(prof.id)
+        except:
+            s.close()
+            raise ServerError("Incorrect credentials.")
+    elif type.lower() == "vk":
+        pass
+    else:
+        s.close()
+        raise ServerError("Incorrect type.")
+
+    try:
+        return __authUser(s=s, login=login, type=type, platform=platform, hw_id=hw_id, reg_id=reg_id)
+    except:
+        raise ServerError("Can't auth user.")
+    finally:
+        s.close()
 
 
 @jsonrpc.method('logout() -> Any', validate=True, authenticated=False)
