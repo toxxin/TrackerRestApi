@@ -91,9 +91,7 @@ def updateGroup(user_id, id, **kwargs):
 
     uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
 
-    t = session.query(association_table_user_group).filter(association_table_user_group.user_id == uid).\
-                                                    filter(association_table_user_group.group_id == id).subquery('t')
-    g = session.quiry(TrGroup).filter(TrGroup.id == t.c.group_id)
+    g = session.query(TrGroup).filter(TrGroup.id == id).filter(TrGroup.user_id == uid).first()
 
     if g is None:
         session.close()
