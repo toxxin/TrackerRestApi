@@ -13,7 +13,7 @@ from TrackerRestApi import Session
 
 from flask_jsonrpc import ServerError, InvalidParamsError
 from sqlautocode_gen.model import *
-from sqlautocode_gen.group_model import TrGroup, association_table_user_group
+from sqlautocode_gen.group_model import TrGroup, TrGroupComment, association_table_user_group
 
 from modules import group_mandatory_params, group_option_params
 
@@ -63,7 +63,7 @@ def addGroup(user_id, title, desc, invitation, meeting, help):
 
     uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
 
-    g = TrGroup(title=title, desc=desc, invitation=invitation, meeting=meeting, help=help)
+    g = TrGroup(title=title, desc=desc, invitation=invitation, meeting=meeting, help=help, user_id=uid)
 
     try:
         session.add(g)
@@ -143,7 +143,7 @@ def delGroup(user_id, id):
 
 
 def fillUser(u):
-    
+
     ret = {
         "id": u.id,
         "login": u.login,
@@ -151,7 +151,6 @@ def fillUser(u):
     }
 
     return ret
-    
 
 @jsonrpc.method('getAccList(user_id=Number,list=String) -> Object', validate=True, authenticated=False)
 @login_required
@@ -170,7 +169,7 @@ def getAccList(user_id, list):
     return lst
 
 
-def fillGroupMessageResponse(m):
+def fillGroupMessageResponse(m, u):
 
     ret = {
         "id": m.id,
@@ -180,13 +179,14 @@ def fillGroupMessageResponse(m):
     }
 
     return ret
-    
+
+
 @jsonrpc.method('getComments(user_id=Number,group_id=Number) -> Object', validate=True, authenticated=False)
 @login_required
 def getComments(user_id, group_id):
 
     session = Session()
-    
+
     uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
 
     t = session.query(association_table_user_group).filter(association_table_user_group.user_id == uid).\
@@ -194,12 +194,12 @@ def getComments(user_id, group_id):
     ms = session.query(TrGroupComment).filter(TrGroupComment.user_group_id == t.c.id).all()
 
     lst = [fillGroupMessageResponse(m, current_user) for m in ms]
-    
+
     session.close()
-    
+
     return lst
-    
-    
+
+
 @jsonrpc.method('addComment(user_id=Number,group_id=Number,message=String) -> Object', validate=True, authenticated=False)
 @login_required
 def addComment(user_id, group_id, message):
@@ -207,36 +207,36 @@ def addComment(user_id, group_id, message):
     session = Session()
 
     uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
-    
-    t = session.quiry(association_table_user_group).filter(association_table_user_group.user_id == uid).\
-                                                    filter(association_table_user_group.group_id == id).first()
-    if t is None:
+
+    ug = session.query(association_table_user_group).filter(association_table_user_group.user_id == uid).\
+                                                    filter(association_table_user_group.group_id == group_id).first()
+    if ug is None:
         session.close()
         raise ServerError("Group doesn't exist.")
 
-    m = TrGroupComment(message=message, user_group_id=t.id)
+    gm = TrGroupComment(message, ug.id)
 
     try:
-        session.add(m)
+        session.add(gm)
         session.commit()
-        session.refresh(m)
+        session.refresh(gm)
     except:
         session.rollback()
         raise ServerError("Can't add message.")
     finally:
         session.close()
-        
-    return m.id
-    
-    
-@jsonrpc.method('delComment(user_id=Number,group_id=Number,id=Number) -> Object', validate=True, authenticated=False)
+
+    return True
+
+
+@jsonrpc.method('delComment(user_id=Number,group_id=Number,message=String) -> Object', validate=True, authenticated=False)
 @login_required
 def delComment(user_id, group_id, id):
 
     session = Session()
-    
+
     uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
-    
+
     t = session.query(association_table_user_group).filter(association_table_user_group.user_id == uid).\
                                                     filter(association_table_user_group.group_id == group_id).subquery('t')
     m = session.query(TrGroupComment).filter(TrGroupComment.user_group_id == t.c.id).\
