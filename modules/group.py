@@ -24,7 +24,7 @@ def fillGroupResponse(g, admin=False):
         "id": g.id,
         "title": g.title,
         "desc": g.desc,
-        "pic": app.config.get('GROUP_IMG_URL') + g.pic if g.pic is not None else g.pic,
+        "pic": app.config.get('GROUPS_IMG_URL') + g.pic if g.pic is not None else g.pic,
         "timestamp": calendar.timegm(g.creation_date.utctimetuple()),
         "admin": admin,
         "invitation": g.invitation,
