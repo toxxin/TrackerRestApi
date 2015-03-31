@@ -1,8 +1,12 @@
+# -*- coding: utf-8 -*-
+
 __author__ = 'Anton Glukhov'
+__copyright__ = "Copyright 2014, Easywhere"
+__email__ = "ag@easywhere.ru"
 
 import calendar
 
-from flask.ext.login import login_required, login_user
+from flask.ext.login import login_required, current_user
 
 from TrackerRestApi import jsonrpc, app
 from TrackerRestApi import Session
@@ -12,65 +16,55 @@ from sqlautocode_gen.model import *
 from sqlautocode_gen.feed_model import TrFeed, TrFeedNews, TrFavFeed, TrFavFeedTest
 
 
-def fillFeedResponse(feed):
+def fillFeedResponse(feed, sub):
 
     ret = {
         "id": feed.id,
         "title": feed.title,
         "link": feed.link,
-        "pic": app.config.get('FEEDS_IMG_URL') + feed.pic if feed.pic is not None else feed.pic
+        "pic": app.config.get('FEEDS_IMG_URL') + feed.pic if feed.pic is not None else feed.pic,
+        "sub": sub
     }
 
     return ret
 
-@jsonrpc.method('getFeeds(user_id=Number) -> Any', validate=True, authenticated=False)
-def getFeeds(user_id):
+
+@jsonrpc.method('s_getFeeds(user_id=Number) -> Any', validate=True, authenticated=False)
+@login_required
+def s_getFeeds(user_id):
 
     session = Session()
 
-    u = session.query(TrUser).filter(TrUser.ID == user_id).first()
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
 
+    u = session.query(TrUser).filter(TrUser.id == uid).first()
     if u is None:
         session.close()
         raise ServerError("User doesn't exist.")
 
-    lst = [fillFeedResponse(f) for f in u.feeds]
+    feeds = session.query(TrFeed, association_table_user_feed).outerjoin(association_table_user_feed).all()
+
+    lst = [fillFeedResponse(f[0], f[1] is not None) for f in feeds]
 
     session.close()
 
     return lst
 
 
-@jsonrpc.method('getAllFeeds(user_id=Number, type=String) -> Object', validate=False, authenticated=False)
-def getAllFeeds(user_id, type=None):
+@jsonrpc.method('s_subFeed(user_id=Number, feed_id=Number) -> Object', validate=True, authenticated=False)
+@login_required
+def s_subFeed(user_id, feed_id):
 
     session = Session()
 
-    if type is None:
-        feeds = session.query(TrFeed).all()
-    else:
-        feeds = session.query(TrFeed).filter(TrFeed.type == type).all()
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
 
-    lst = [fillFeedResponse(f) for f in feeds]
-
-    session.close()
-
-    return lst
-
-
-@jsonrpc.method('subFeed(user_id=Number, feed_id=Number) -> Object', validate=True, authenticated=False)
-def subFeed(user_id, feed_id):
-
-    session = Session()
-
-    u = session.query(TrUser).filter(TrUser.ID == user_id).first()
-
+    u = session.query(TrUser).filter(TrUser.id == uid).first()
     if u is None:
         session.close()
         raise ServerError("User doesn't exist.")
 
     f = session.query(TrFeed).filter(TrFeed.id == feed_id).first()
-
     if f is None:
         session.close()
         raise ServerError("Feed doesn't exist.")
@@ -83,19 +77,20 @@ def subFeed(user_id, feed_id):
     return True
 
 
-@jsonrpc.method('unsubFeed(user_id=Number, feed_id=Number) -> Object', validate=True, authenticated=False)
-def unsubFeed(user_id, feed_id):
+@jsonrpc.method('s_unsubFeed(user_id=Number, feed_id=Number) -> Object', validate=True, authenticated=False)
+@login_required
+def s_unsubFeed(user_id, feed_id):
 
     session = Session()
 
-    u = session.query(TrUser).filter(TrUser.ID == user_id).first()
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
 
+    u = session.query(TrUser).filter(TrUser.id == user_id).first()
     if u is None:
         session.close()
         raise ServerError("User doesn't exist.")
 
     for f in u.feeds:
-
         if f.id == feed_id:
             u.feeds.remove(f)
             session.commit()
@@ -104,133 +99,6 @@ def unsubFeed(user_id, feed_id):
     session.close()
 
     return True
-
-
-@jsonrpc.method('addFavFeed(user_id=Number, feed_id=Number, link=String) -> Object', validate=True, authenticated=False)
-def addFavFeed(user_id, feed_id, link):
-
-    session = Session()
-
-    u_f = session.query(association_table_user_feed).filter_by(user_id = user_id).filter_by(feed_id = feed_id).first()
-
-    if u_f is None:
-        session.close()
-        raise ServerError("User or feed doesn't exist.")
-
-    fav = TrFavFeed(link=link, user_feed_id=u_f.id)
-
-    try:
-        session.add(fav)
-        session.commit()
-    except:
-        session.rollback()
-        raise ServerError("Can't add item to favorites.")
-    finally:
-        session.close()
-
-    return True
-
-
-@jsonrpc.method('s_addFavFeed(user_id=Number, feed_id=Number, id=Number) -> Object', validate=True, authenticated=False)
-def s_addFavFeed(user_id, feed_id, id):
-
-    session = Session()
-
-    u_f = session.query(association_table_user_feed).filter_by(user_id = user_id).filter_by(feed_id = feed_id).first()
-
-    if u_f is None:
-        session.close()
-        raise ServerError("User or feed doesn't exist.")
-
-    fav = TrFavFeedTest(u_f.user_id, u_f.feed_id, id)
-
-    try:
-        session.add(fav)
-        session.commit()
-    except:
-        session.rollback()
-        raise ServerError("Can't add item to favorites.")
-    finally:
-        session.close()
-
-
-@jsonrpc.method('delFavFeed(user_id=Number, feed_id=Number, link=String) -> Object', validate=True, authenticated=False)
-def delFavFeed(user_id, feed_id, link):
-
-    session = Session()
-
-    t = session.query(association_table_user_feed).filter_by(user_id = user_id).filter_by(feed_id = feed_id).subquery('t')
-    fav = session.query(TrFavFeed).filter(TrFavFeed.user_feed_id == t.c.id).filter(TrFavFeed.link == link).first()
-
-    if fav is None:
-        session.close()
-        raise ServerError("Fav item doesn't exist.")
-
-    try:
-        session.delete(fav)
-        session.commit()
-    except:
-        session.rollback()
-        raise ServerError("Can't delete item from favorites.")
-    finally:
-        session.close()
-
-    return True
-
-
-@jsonrpc.method('s_delFavFeed(user_id=Number, feed_id=Number, id=Number) -> Object', validate=True, authenticated=False)
-def s_delFavFeed(user_id, feed_id, id):
-
-    session = Session()
-
-    fav = session.query(TrFavFeedTest).filter(TrFavFeedTest.u_id == user_id).\
-                                        filter(TrFavFeedTest.f_id == feed_id).\
-                                        filter(TrFavFeedTest.p_id == id).first()
-
-    if fav is None:
-        session.close()
-        raise ServerError("Fav item doesn't exist.")
-
-    try:
-        session.delete(fav)
-        session.commit()
-    except:
-        session.rollback()
-        raise ServerError("Can't delete item from favorites.")
-    finally:
-        session.close()
-
-    return True
-
-
-@jsonrpc.method('getFavsFeed(user_id=Number, feed_id=Number) -> Object', validate=True, authenticated=False)
-def getFavsFeed(user_id, feed_id):
-
-    session = Session()
-
-    t = session.query(association_table_user_feed).filter_by(user_id = user_id).filter_by(feed_id = feed_id).subquery('t')
-    favs = session.query(TrFavFeed).filter(TrFavFeed.user_feed_id == t.c.id).all()
-
-    ret = [f.link for f in favs]
-
-    session.close()
-
-    return ret
-
-
-@jsonrpc.method('s_getFavsFeed(user_id=Number, feed_id=Number) -> Object', validate=True, authenticated=False)
-def s_getFavsFeed(user_id, feed_id):
-
-    session = Session()
-
-    favs = session.query(TrFavFeedTest).filter(TrFavFeedTest.u_id == user_id).\
-                                        filter(TrFavFeedTest.f_id == feed_id).all()
-
-    ret = [f.p_id for f in favs]
-
-    session.close()
-
-    return ret
 
 
 def s_fillFeedResponse(f):
@@ -248,13 +116,15 @@ def s_fillFeedResponse(f):
 
     return ret
 
-
-@jsonrpc.method('s_getFeeds(user_id=Number, since=Number) -> Any', validate=True, authenticated=False)
-def s_getFeeds(user_id, since):
+@jsonrpc.method('s_getFeedNews(user_id=Number, since=Number) -> Object', validate=True, authenticated=False)
+@login_required
+def s_getFeedNews(user_id, since):
 
     session = Session()
 
-    t = session.query(association_table_user_feed).filter_by(user_id=user_id).subquery('t')
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    t = session.query(association_table_user_feed).filter_by(user_id=uid).subquery('t')
     fs = session.query(TrFeedNews).filter(TrFeedNews.feed_id == t.c.feed_id).\
                                     filter(TrFeedNews.pub_date > datetime.datetime.fromtimestamp(since)).all()
 
