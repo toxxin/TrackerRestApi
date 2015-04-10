@@ -133,3 +133,84 @@ def s_getFeedNews(user_id, since):
     session.close()
 
     return lst
+
+@jsonrpc.method('s_addFavFeed(user_id=Number, feed_id=Number, id=Number) -> Object', validate=True, authenticated=False)
+def s_addFavFeed(user_id, feed_id, id):
+
+    session = Session()
+
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    u_f = session.query(association_table_user_feed).filter_by(user_id=uid).filter_by(feed_id=feed_id).first()
+    if u_f is None:
+        session.close()
+        raise ServerError("User or feed doesn't exist.")
+
+    uf_fav = session.query(TrUserFeedFav).filter_by(uf_id=u_f.id).filter_by(feed_news_id=id).first()
+
+    if uf_fav is None:
+        new_fav = TrUserFeedFav(uf_id=u_f.id, feed_news_id=id)
+
+        try:
+            session.add(new_fav)
+            session.commit()
+        except:
+            session.rollback()
+            raise ServerError("Can't add item to favorites.")
+        finally:
+            session.close()
+    else:
+        session.close()
+
+    return True
+
+
+@jsonrpc.method('s_delFavFeed(user_id=Number, feed_id=Number, id=Number) -> Object', validate=True, authenticated=False)
+def s_delFavFeed(user_id, feed_id, id):
+
+    session = Session()
+
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    u_f = session.query(association_table_user_feed).filter_by(user_id=uid).filter_by(feed_id=feed_id).first()
+    if u_f is None:
+        session.close()
+        raise ServerError("User or feed doesn't exist.")
+
+    uf_fav = session.query(TrUserFeedFav).filter_by(uf_id=u_f.id).filter_by(feed_news_id=id).first()
+
+    if uf_fav is not None:
+
+        try:
+            session.delete(uf_fav)
+            session.commit()
+        except:
+            session.rollback()
+            raise ServerError("Can't delete item from favorites.")
+        finally:
+            session.close()
+    else:
+        session.close()
+
+    return True
+
+
+@jsonrpc.method('s_getFavsFeed(user_id=Number, feed_id=Number) -> Object', validate=True, authenticated=False)
+def s_getFavsFeed(user_id, feed_id):
+
+    session = Session()
+
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    u_f = session.query(association_table_user_feed).filter_by(user_id=uid).filter_by(feed_id=feed_id).first()
+    if u_f is None:
+        session.close()
+        raise ServerError("User or feed doesn't exist.")
+
+    favs = session.query(TrUserFeedFav).filter_by(uf_id=u_f.id).all()
+
+    ret = [f.feed_news_id for f in favs]
+
+    session.close()
+
+    return ret
