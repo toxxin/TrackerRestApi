@@ -44,21 +44,26 @@ class TrFeedNews(DeclarativeBase):
 
     #colomn definition
     id = Column(u'id', Integer, primary_key=True)
+    url = Column(u'url', String(255), nullable=False)
     guid = Column(u'guid', String(255), unique=True, nullable=False)
     title = Column(u'title', String(255), nullable=False)
     link = Column(u'link', String(255), nullable=False)
     pic = Column(u'pic', String(255))
     desc = Column(u'desc', UnicodeText, nullable=True)
     fulltext = Column(u'fulltext', UnicodeText, nullable=True)
-    pub_date = Column(u'pub_date', TIMESTAMP(), nullable=False, default=func.now())
+    creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
+    published = Column(u'published', TIMESTAMP(), nullable=False)
     feed_id = Column(u'feed_id', Integer, ForeignKey('tr_feed.id'), nullable=False)
 
-    def __init__(self, title, link, desc, pub_date, feed_id, pic=None):
+    def __init__(self, url, guid, title, link, desc, fulltext, published, feed_id, pic=None):
+        self.url = url
+        self.guid = guid
         self.title = title
         self.link = link
         self.pic = pic
         self.desc = desc
-        self.pub_date = pub_date
+        self.fulltext = fulltext
+        self.published = published
         self.feed_id = feed_id
 
 
