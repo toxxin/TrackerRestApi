@@ -111,7 +111,7 @@ def s_fillFeedResponse(f):
         "pic": f.pic if f.pic is not None else None,
         "desc": f.desc,
         "fulltext": f.fulltext,
-        "pub_date": calendar.timegm(f.pub_date.utctimetuple())
+        "published": calendar.timegm(f.published.utctimetuple())
     }
 
     return ret
@@ -126,7 +126,7 @@ def s_getFeedNews(user_id, since):
 
     t = session.query(association_table_user_feed).filter_by(user_id=uid).subquery('t')
     fs = session.query(TrFeedNews).filter(TrFeedNews.feed_id == t.c.feed_id).\
-                                    filter(TrFeedNews.pub_date > datetime.datetime.fromtimestamp(since)).all()
+                                    filter(TrFeedNews.published > datetime.datetime.fromtimestamp(since)).all()
 
     lst = [s_fillFeedResponse(f) for f in fs]
 
