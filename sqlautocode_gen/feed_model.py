@@ -13,6 +13,16 @@ association_table_user_feed = Table('tr_user_feed', DeclarativeBase.metadata,
     Column(u'user_id', Integer, ForeignKey('tr_user.id'), nullable=False),
     Column(u'feed_id', Integer, ForeignKey('tr_feed.id'), nullable=False)
     )
+    
+
+class TrUserFeedFav(DeclarativeBase):
+    __tablename__ = 'tr_user_feed_fav'
+
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
+    id = Column(u'id', Integer, primary_key=True)
+    uf_id = Column(Integer, ForeignKey('tr_user_feed.id'), nullable=False)
+    feed_news_id = Column(Integer, ForeignKey('tr_feed_news.id'), nullable=False)
 
 
 class TrFeed(DeclarativeBase):
