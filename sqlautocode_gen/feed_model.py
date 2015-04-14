@@ -75,36 +75,3 @@ class TrFeedNews(DeclarativeBase):
         self.fulltext = fulltext
         self.published = published
         self.feed_id = feed_id
-
-
-class TrFavFeed(DeclarativeBase):
-    __tablename__ = 'tr_fav_feed'
-
-    __table_args__ = {'mysql_engine': 'InnoDB'}
-
-    #colomn definition
-    id = Column(u'id', Integer, primary_key=True)
-    link = Column(u'link', String(255), nullable=False)
-    creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
-    user_feed_id = Column(u'user_feed_id', Integer, ForeignKey('tr_user_feed.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
-
-    def __init__(self, link, user_feed_id):
-        self.link = link
-        self.user_feed_id = user_feed_id
-
-
-class TrFavFeedTest(DeclarativeBase):
-    __tablename__ = 'tr_fav_feed_test'
-
-    __table_args__ = {'mysql_engine': 'InnoDB'}
-
-    #colomn definition
-    u_id = Column(u'u_id', Integer, ForeignKey('tr_user.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
-    f_id = Column(u'f_id', Integer, ForeignKey('tr_feed.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
-    p_id = Column(u'p_id', Integer, ForeignKey('tr_feed_news.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
-    creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
-
-    def __init__(self, u_id, f_id, p_id):
-        self.u_id = u_id
-        self.f_id = f_id
-        self.p_id = p_id
