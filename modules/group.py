@@ -256,3 +256,30 @@ def delComment(user_id, group_id, id):
         session.close()
 
     return True
+
+
+@jsonrpc.method('getGroupMembers(user_id=Number,id=Number) -> Object', validate=True, authenticated=False)
+@login_required
+def getGroupMembers(user_id, id):
+
+    session = Session()
+
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    """ Check if user is admin """
+    g = session.query(TrGroup).filter(TrGroup.user_id == uid).filter(TrGroup.id == id).first()
+    if g is None:
+        """ Check if user is not admin """
+        tmp = session.query(association_table_user_group,TrUser).filter_by(group_id=id).join(TrUser).all()
+        """ tmp: (134L, 288L, 145L, <sqlautocode_gen.model.TrUser object at 0x10aed8d10>) """
+
+        lst = [fillUser(t[3]) for t in tmp]
+        print "testtest"
+    else:
+        lst = [fillUser(u) for u in g.users]
+        print "not none"
+
+    session.close()
+
+    return lst
+
