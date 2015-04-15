@@ -95,9 +95,9 @@ class FeedGetTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "u1", "testtest")
-        cls.u2 = TrUser("2013-12-12 12:12:12", "u2", "testtest")
-        cls.u3 = TrUser("2013-12-12 12:12:12", "u3", "testtest")
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
         user_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(user_list)
         session.add_all(user_list)
@@ -106,8 +106,8 @@ class FeedGetTestCase(BaseTestCase):
         session.refresh(cls.u2)
         session.commit()
 
-        cls.f1 = TrFeed("ttl1", "l1.com")
-        cls.f2 = TrFeed("ttl2", "l2.com")
+        cls.f1 = TrFeed("ttl1", "l1.com", "A", "http://pic1.com")
+        cls.f2 = TrFeed("ttl2", "l2.com", "A", "http://pic2.com")
         f_list = [cls.f1, cls.f2]
         cls.v_count = len(f_list)
         session.add_all(f_list)
@@ -139,25 +139,46 @@ class FeedGetTestCase(BaseTestCase):
 
         self.session.add(self.u1)
 
-        data = server.getFeeds(self.u1.ID)
+        data = server.s_getFeeds(self.u1.id)
 
         self.assertJsonRpc(data)
-        self.assertIs(type(data['result']), list)
-        self.assertEquals(len(data['result']), 1)
+        self.assertEquals(len(data['result']), 2)
         self.assertEquals(data['result'][0]['title'], u'ttl1')
+        self.assertEquals(data['result'][0]['sub'], True)
+        print data['result'][1]
+        self.assertEquals(data['result'][1]['title'], u'ttl2')
+        self.assertEquals(data['result'][1]['sub'], False)
 
 
-    def test_one_feed_for_user(self):
+    def test_multi_feed_for_user(self):
 
         self.session.add(self.u2)
 
-        data = server.getFeeds(self.u2.ID)
+        data = server.s_getFeeds(self.u2.id)
 
         self.assertJsonRpc(data)
         self.assertIs(type(data['result']), list)
         self.assertEquals(len(data['result']), 2)
         self.assertEquals(data['result'][0]['title'], u'ttl1')
+        self.assertEquals(data['result'][0]['sub'], True)
         self.assertEquals(data['result'][1]['title'], u'ttl2')
+        self.assertEquals(data['result'][1]['sub'], True)
+
+
+    def test_none_feed_for_user(self):
+    
+        self.session.add(self.u3)
+    
+        data = server.s_getFeeds(self.u3.id)
+    
+        self.assertJsonRpc(data)
+        self.assertIs(type(data['result']), list)
+        self.assertEquals(len(data['result']), 2)
+        self.assertEquals(data['result'][0]['title'], u'ttl1')
+        self.assertEquals(data['result'][0]['sub'], False)
+        self.assertEquals(data['result'][1]['title'], u'ttl2')
+        self.assertEquals(data['result'][1]['sub'], False)
+
 
 
 class FeedSubTestCase(BaseTestCase):
