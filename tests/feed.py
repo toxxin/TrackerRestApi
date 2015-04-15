@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
+
 __author__ = 'Anton Glukhov'
+__copyright__ = "Copyright 2014, Easywhere"
+__email__ = "ag@easywhere.ru"
 
 import unittest
 from base import BaseTestCase
 from sqlautocode_gen.model import *
+from sqlautocode_gen.feed_model import TrFeed
 from tests.run import Session, server
 
 
@@ -22,9 +26,9 @@ class FeedBaseTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "u1", "testtest")
-        cls.u2 = TrUser("2013-12-12 12:12:12", "u2", "testtest")
-        cls.u3 = TrUser("2013-12-12 12:12:12", "u3", "testtest")
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
         user_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(user_list)
         session.add_all(user_list)
@@ -33,8 +37,8 @@ class FeedBaseTestCase(BaseTestCase):
         session.refresh(cls.u2)
         session.commit()
 
-        cls.f1 = TrFeed("ttl1", "l1.com")
-        cls.f2 = TrFeed("ttl2", "l2.com")
+        cls.f1 = TrFeed("ttl1", "l1.com", "A", "http://pic1.com")
+        cls.f2 = TrFeed("ttl2", "l2.com", "A", "http://pic2.com")
         f_list = [cls.f1, cls.f2]
         cls.v_count = len(f_list)
         session.add_all(f_list)
@@ -79,7 +83,7 @@ class FeedBaseTestCase(BaseTestCase):
         self.session.delete(self.u2)
         self.session.commit()
 
-        ufeeds = self.session.query(association_table_user_feed).filter_by(user_id = self.u2.ID).all()
+        ufeeds = self.session.query(association_table_user_feed).filter_by(user_id = self.u2.id).all()
 
         self.assertEquals(len(ufeeds), 0)
 
