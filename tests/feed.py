@@ -180,7 +180,6 @@ class FeedGetTestCase(BaseTestCase):
         self.assertEquals(data['result'][1]['sub'], False)
 
 
-
 class FeedSubTestCase(BaseTestCase):
 
     @classmethod
@@ -188,9 +187,9 @@ class FeedSubTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "u1", "testtest")
-        cls.u2 = TrUser("2013-12-12 12:12:12", "u2", "testtest")
-        cls.u3 = TrUser("2013-12-12 12:12:12", "u3", "testtest")
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
         user_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(user_list)
         session.add_all(user_list)
@@ -199,8 +198,8 @@ class FeedSubTestCase(BaseTestCase):
         session.refresh(cls.u2)
         session.commit()
 
-        cls.f1 = TrFeed("ttl1", "l1.com")
-        cls.f2 = TrFeed("ttl2", "l2.com")
+        cls.f1 = TrFeed("ttl1", "l1.com", "A", "http://pic1.com")
+        cls.f2 = TrFeed("ttl2", "l2.com", "A", "http://pic2.com")
         f_list = [cls.f1, cls.f2]
         cls.v_count = len(f_list)
         session.add_all(f_list)
@@ -229,14 +228,14 @@ class FeedSubTestCase(BaseTestCase):
         self.session.add(self.u1)
         self.session.add(self.f1)
 
-        data = server.subFeed(self.u1.ID, self.f1.id)
+        data = server.s_subFeed(self.u1.id, self.f1.id)
 
         self.assertJsonRpc(data)
         self.assertIs(data['result'], True)
 
         """ Separate session, cause cross-session's transaction collision """
         s = Session()
-        u = s.query(TrUser).get(self.u1.ID)
+        u = s.query(TrUser).get(self.u1.id)
         self.assertIsNotNone(u)
         self.assertEquals(len(u.feeds), 1)
         s.close()
@@ -246,7 +245,7 @@ class FeedSubTestCase(BaseTestCase):
         self.session.add(self.u1)
         self.session.add(self.f1)
 
-        data = server.subFeed(self.u1.ID + 1000, self.f1.id)
+        data = server.s_subFeed(self.u1.id + 1000, self.f1.id)
 
         self.assertJsonRpcErr(data)
         self.assertEquals(data['error'][u'message'], "ServerError: User doesn't exist.")
@@ -256,7 +255,7 @@ class FeedSubTestCase(BaseTestCase):
         self.session.add(self.u1)
         self.session.add(self.f1)
 
-        data = server.subFeed(self.u1.ID, self.f1.id + 1000)
+        data = server.s_subFeed(self.u1.id, self.f1.id + 1000)
 
         self.assertJsonRpcErr(data)
         self.assertEquals(data['error'][u'message'], "ServerError: Feed doesn't exist.")
@@ -269,14 +268,14 @@ class FeedSubTestCase(BaseTestCase):
         self.u2.feeds.append(self.f2)
         self.session.commit()
 
-        data = server.subFeed(self.u2.ID, self.f2.id)
+        data = server.s_subFeed(self.u2.id, self.f2.id)
 
         self.assertJsonRpc(data)
         self.assertIs(data['result'], True)
 
         """ Separate session, cause cross-session's transaction collision """
         s = Session()
-        u = s.query(TrUser).get(self.u2.ID)
+        u = s.query(TrUser).get(self.u2.id)
         self.assertIsNotNone(u)
         self.assertEquals(len(u.feeds), 1)
         s.close()
@@ -289,9 +288,9 @@ class FeedUnsubTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "u1", "testtest")
-        cls.u2 = TrUser("2013-12-12 12:12:12", "u2", "testtest")
-        cls.u3 = TrUser("2013-12-12 12:12:12", "u3", "testtest")
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
         user_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(user_list)
         session.add_all(user_list)
@@ -300,8 +299,8 @@ class FeedUnsubTestCase(BaseTestCase):
         session.refresh(cls.u2)
         session.commit()
 
-        cls.f1 = TrFeed("ttl1", "l1.com")
-        cls.f2 = TrFeed("ttl2", "l2.com")
+        cls.f1 = TrFeed("ttl1", "l1.com", "A", "http://pic1.com")
+        cls.f2 = TrFeed("ttl2", "l2.com", "A", "http://pic2.com")
         f_list = [cls.f1, cls.f2]
         cls.v_count = len(f_list)
         session.add_all(f_list)
@@ -333,14 +332,14 @@ class FeedUnsubTestCase(BaseTestCase):
         self.session.add(self.u1)
         self.session.add(self.f1)
 
-        data = server.unsubFeed(self.u1.ID, self.f1.id)
+        data = server.s_unsubFeed(self.u1.id, self.f1.id)
 
         self.assertJsonRpc(data)
         self.assertIs(data['result'], True)
 
         """ Separate session, cause cross-session's transaction collision """
         s = Session()
-        u = s.query(TrUser).get(self.u1.ID)
+        u = s.query(TrUser).get(self.u1.id)
         self.assertIsNotNone(u)
         self.assertEquals(len(u.feeds), 0)
         s.close()
