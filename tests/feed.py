@@ -352,9 +352,9 @@ class FeedAddFavTestCase(BaseTestCase):
 
         session = Session()
 
-        cls.u1 = TrUser("2013-12-12 12:12:12", "u1", "testtest")
-        cls.u2 = TrUser("2013-12-12 12:12:12", "u2", "testtest")
-        cls.u3 = TrUser("2013-12-12 12:12:12", "u3", "testtest")
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
         user_list = [cls.u1, cls.u2, cls.u3]
         cls.user_count = len(user_list)
         session.add_all(user_list)
@@ -363,11 +363,18 @@ class FeedAddFavTestCase(BaseTestCase):
         session.refresh(cls.u2)
         session.commit()
 
-        cls.f1 = TrFeed("ttl1", "l1.com")
-        cls.f2 = TrFeed("ttl2", "l2.com")
+        cls.f1 = TrFeed("ttl1", "l1.com", "A", "http://pic1.com")
+        cls.f2 = TrFeed("ttl2", "l2.com", "A", "http://pic2.com")
         f_list = [cls.f1, cls.f2]
         cls.v_count = len(f_list)
         session.add_all(f_list)
+        session.commit()
+
+        cls.fn1 = TrFeedNews(url="Url1", guid="g1", title="t1", link="l1", desc="d1", published="2013-12-12 12:12:12", feed_id=cls.f1.id)
+        cls.fn2 = TrFeedNews(url="Url2", guid="g2", title="t2", link="l2", desc="d2", published="2013-12-12 12:12:12", feed_id=cls.f1.id)
+        fn_list = [cls.fn1, cls.fn2]
+        cls.fn_count = len(fn_list)
+        session.add_all(fn_list)
         session.commit()
 
         cls.u1.feeds = [cls.f1]
@@ -395,8 +402,9 @@ class FeedAddFavTestCase(BaseTestCase):
 
         self.session.add(self.u1)
         self.session.add(self.f1)
+        self.session.add(self.fn1)
 
-        data = server.addFavFeed(self.u1.ID, self.f1.id, "test_link")
+        data = server.s_addFavFeed(self.u1.id, self.f1.id, self.fn1.id)
 
         self.assertJsonRpc(data)
         self.assertIs(data['result'], True)
