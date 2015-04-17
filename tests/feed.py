@@ -40,7 +40,7 @@ class FeedBaseTestCase(BaseTestCase):
         cls.f1 = TrFeed("ttl1", "l1.com", "A", "http://pic1.com")
         cls.f2 = TrFeed("ttl2", "l2.com", "A", "http://pic2.com")
         f_list = [cls.f1, cls.f2]
-        cls.v_count = len(f_list)
+        cls.f_count = len(f_list)
         session.add_all(f_list)
         session.commit()
 
@@ -109,7 +109,7 @@ class FeedGetTestCase(BaseTestCase):
         cls.f1 = TrFeed("ttl1", "l1.com", "A", "http://pic1.com")
         cls.f2 = TrFeed("ttl2", "l2.com", "A", "http://pic2.com")
         f_list = [cls.f1, cls.f2]
-        cls.v_count = len(f_list)
+        cls.f_count = len(f_list)
         session.add_all(f_list)
         session.commit()
 
@@ -201,7 +201,7 @@ class FeedSubTestCase(BaseTestCase):
         cls.f1 = TrFeed("ttl1", "l1.com", "A", "http://pic1.com")
         cls.f2 = TrFeed("ttl2", "l2.com", "A", "http://pic2.com")
         f_list = [cls.f1, cls.f2]
-        cls.v_count = len(f_list)
+        cls.f_count = len(f_list)
         session.add_all(f_list)
         session.commit()
 
@@ -302,7 +302,7 @@ class FeedUnsubTestCase(BaseTestCase):
         cls.f1 = TrFeed("ttl1", "l1.com", "A", "http://pic1.com")
         cls.f2 = TrFeed("ttl2", "l2.com", "A", "http://pic2.com")
         f_list = [cls.f1, cls.f2]
-        cls.v_count = len(f_list)
+        cls.f_count = len(f_list)
         session.add_all(f_list)
         session.commit()
 
@@ -366,7 +366,7 @@ class FeedAddFavTestCase(BaseTestCase):
         cls.f1 = TrFeed("ttl1", "l1.com", "A", "http://pic1.com")
         cls.f2 = TrFeed("ttl2", "l2.com", "A", "http://pic2.com")
         f_list = [cls.f1, cls.f2]
-        cls.v_count = len(f_list)
+        cls.f_count = len(f_list)
         session.add_all(f_list)
         session.commit()
 
@@ -431,7 +431,7 @@ class FeedDelFavTestCase(BaseTestCase):
         cls.f1 = TrFeed("ttl1", "l1.com")
         cls.f2 = TrFeed("ttl2", "l2.com")
         f_list = [cls.f1, cls.f2]
-        cls.v_count = len(f_list)
+        cls.f_count = len(f_list)
         session.add_all(f_list)
         session.commit()
 
