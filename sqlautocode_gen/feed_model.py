@@ -65,7 +65,7 @@ class TrFeedNews(DeclarativeBase):
     published = Column(u'published', TIMESTAMP(), nullable=False)
     feed_id = Column(u'feed_id', Integer, ForeignKey('tr_feed.id'), nullable=False)
 
-    def __init__(self, url, guid, title, link, desc, fulltext, published, feed_id, pic=None):
+    def __init__(self, url, guid, title, link, published, feed_id, desc=None, fulltext=None, pic=None):
         self.url = url
         self.guid = guid
         self.title = title
