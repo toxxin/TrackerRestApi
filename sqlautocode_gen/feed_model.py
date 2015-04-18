@@ -21,8 +21,8 @@ class TrUserFeedFav(DeclarativeBase):
     __table_args__ = {'mysql_engine': 'InnoDB'}
 
     id = Column(u'id', Integer, primary_key=True)
-    uf_id = Column(Integer, ForeignKey('tr_user_feed.id'), nullable=False)
-    feed_news_id = Column(Integer, ForeignKey('tr_feed_news.id'), nullable=False)
+    uf_id = Column(u'uf_id', Integer, ForeignKey('tr_user_feed.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    feed_news_id = Column(u'feed_news_id', Integer, ForeignKey('tr_feed_news.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
 
 
 class TrFeed(DeclarativeBase):
