@@ -42,6 +42,7 @@ def s_getFeeds(user_id):
         session.close()
         raise ServerError("User doesn't exist.")
 
+    TODO::Incorrect SQL statement!
     feeds = session.query(TrFeed, association_table_user_feed).outerjoin(association_table_user_feed).all()
 
     lst = [fillFeedResponse(f[0], f[1] is not None) for f in feeds]
