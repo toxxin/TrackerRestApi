@@ -402,12 +402,20 @@ class FeedAddFavTestCase(BaseTestCase):
 
         self.session.add(self.u1)
         self.session.add(self.f1)
+        self.session.add(self.f2)
         self.session.add(self.fn1)
 
         data = server.s_addFavFeed(self.u1.id, self.f1.id, self.fn1.id)
 
         self.assertJsonRpc(data)
         self.assertIs(data['result'], True)
+
+        data = server.s_getFeedNews(self.u1.id, 0)
+
+        self.assertJsonRpc(data)
+        self.assertEquals(len(data['result']), 2)
+        self.assertEquals(data['result'][0]['sub'], True)
+        self.assertEquals(data['result'][1]['sub'], False)
 
 
 class FeedDelFavTestCase(BaseTestCase):
