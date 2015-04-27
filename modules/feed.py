@@ -112,7 +112,8 @@ def s_fillFeedResponse(f):
         "pic": f.pic if f.pic is not None else None,
         "desc": f.desc,
         "fulltext": f.fulltext,
-        "published": calendar.timegm(f.published.utctimetuple())
+        "published": calendar.timegm(f.published.utctimetuple()),
+        "sub": sub
     }
 
     return ret
@@ -126,8 +127,10 @@ def s_getFeedNews(user_id, since):
     uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
 
     t = session.query(association_table_user_feed).filter_by(user_id=uid).subquery('t')
-    fs = session.query(TrFeedNews).filter(TrFeedNews.feed_id == t.c.feed_id).\
-                                    filter(TrFeedNews.published > datetime.datetime.fromtimestamp(since)).all()
+    fs = session.query(TrFeedNews, TrUserFeedFav.id).outerjoin(TrUserFeedFav).filter(TrFeedNews.feed_id == t.c.feed_id).\
+                        filter(TrFeedNews.published > datetime.datetime.fromtimestamp(since)).all()
+
+    lst = [s_fillFeedResponse(f[0], f[1] is not None) for f in fs]
 
     lst = [s_fillFeedResponse(f) for f in fs]
 
