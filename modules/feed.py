@@ -102,7 +102,7 @@ def s_unsubFeed(user_id, feed_id):
     return True
 
 
-def s_fillFeedResponse(f):
+def s_fillFeedResponse(f, fav):
 
     ret = {
         "id": f.id,
@@ -113,7 +113,7 @@ def s_fillFeedResponse(f):
         "desc": f.desc,
         "fulltext": f.fulltext,
         "published": calendar.timegm(f.published.utctimetuple()),
-        "sub": sub
+        "fav": fav
     }
 
     return ret
