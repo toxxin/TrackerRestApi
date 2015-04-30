@@ -371,7 +371,7 @@ class FeedGetNewsTestCase(BaseTestCase):
         session.commit()
 
         cls.fn1 = TrFeedNews(url="Url1", guid="g1", title="t1", link="l1", desc="d1", published="2013-12-12 12:12:12", feed_id=cls.f1.id)
-        cls.fn2 = TrFeedNews(url="Url2", guid="g2", title="t2", link="l2", desc="d2", published="2013-12-12 12:12:12", feed_id=cls.f1.id)
+        cls.fn2 = TrFeedNews(url="Url2", guid="g2", title="t2", link="l2", desc="d2", published="2012-12-12 12:12:12", feed_id=cls.f1.id)
         fn_list = [cls.fn1, cls.fn2]
         cls.fn_count = len(fn_list)
         session.add_all(fn_list)
@@ -411,9 +411,17 @@ class FeedGetNewsTestCase(BaseTestCase):
         self.assertEquals(data['result'][1]['title'], u't2')
 
 
-    @unittest.skip("test_get_feed_news_since")
     def test_get_feed_news_since(self):
-        pass
+
+        self.session.add(self.u1)
+
+        data = server.s_getFeedNews(self.u1.id, 1355314335)
+
+        self.assertJsonRpc(data)
+        self.assertEquals(len(data['result']), 1)
+        self.assertEquals(data['result'][0]['title'], u't1')
+        self.assertEquals(data['result'][0]['fav'], False)
+        self.assertEquals(data['result'][0]['published'], 1386850332)
 
 
 class FeedAddFavTestCase(BaseTestCase):
