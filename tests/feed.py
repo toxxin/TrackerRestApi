@@ -575,10 +575,6 @@ class FeedDelFavTestCase(BaseTestCase):
         s.close()
 
 
-class FeedGetFavsTestCase(BaseTestCase):
-    pass
-
-
 def suite():
 
     loader = unittest.TestLoader()
@@ -591,7 +587,6 @@ def suite():
     suite.addTests(loader.loadTestsFromTestCase(FeedGetNewsTestCase))
     suite.addTests(loader.loadTestsFromTestCase(FeedAddFavTestCase))
     suite.addTests(loader.loadTestsFromTestCase(FeedDelFavTestCase))
-    suite.addTests(loader.loadTestsFromTestCase(FeedGetFavsTestCase))
 
     return suite
 
