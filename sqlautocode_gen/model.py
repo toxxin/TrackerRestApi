@@ -339,16 +339,3 @@ class TrVehicleTax(DeclarativeBase):
 # except:
 #     pass
 # metadata.create_all(engine)
-
-
-# try:
-#     TrDGeozone.__table__.drop(engine)
-#     TrDLocation.__table__.drop(engine)
-#     TrPushToken.__table__.drop(engine)
-#     TrHelp.__table__.drop(engine)
-#     TrDevice.__table__.drop(engine)
-#     TrVehicle.__table__.drop(engine)
-#     TrFeed.__table__.drop(engine)
-# except:
-#     pass
-# metadata.create_all(engine)
