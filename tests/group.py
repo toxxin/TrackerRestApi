@@ -429,6 +429,124 @@ class GroupGetGroupMembersTestCase(BaseTestCase):
 
         session.close()
 
+
+class CommentAddTestCase(BaseTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+
+        session = Session()
+
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)  # one own group, not member
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)  # two own groups, not member
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)  # no own groups, member in one group
+        cls.u4 = TrUser(login="44444", type="phone", auth_code="4444", authenticated=True)  # no own groups, member in two groups
+        cls.u5 = TrUser(login="55555", type="phone", auth_code="5555", authenticated=True)  # one own group, member in one group
+        cls.u6 = TrUser(login="66666", type="phone", auth_code="6666", authenticated=True)  # two own groups, member in two groups
+        u_list = [cls.u1, cls.u2, cls.u3, cls.u4, cls.u5, cls.u6]
+        cls.user_count = len(u_list)
+        session.add_all(u_list)
+        session.flush()
+        session.refresh(cls.u1)
+        session.refresh(cls.u2)
+        session.refresh(cls.u3)
+        session.refresh(cls.u4)
+        session.refresh(cls.u5)
+        session.refresh(cls.u6)
+        session.commit()
+
+        cls.g1 = TrGroup(user_id=cls.u1.id, title="g1")
+        cls.g2 = TrGroup(user_id=cls.u2.id, title="g2.1")
+        cls.g3 = TrGroup(user_id=cls.u2.id, title="g2.2")
+        g_list = [cls.g1, cls.g2, cls.g3]
+        cls.group_count = len(g_list)
+        session.add_all(g_list)
+        session.commit()
+
+        # Add users to groups
+        cls.g2.users.append(cls.u1)
+        session.add_all([cls.g2])
+        session.commit()
+
+        session.close()
+        
+        # TODO: Add tests for comments
+
+    @classmethod
+    def tearDownClass(cls):
+
+        session = Session()
+
+        users = session.query(TrUser).all()
+        map(session.delete, users)
+
+        groups = session.query(TrGroup).all()
+        map(session.delete, groups)
+
+        session.commit()
+
+        session.close()
+
+
+class CommentDeleteTestCase(BaseTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+
+        session = Session()
+
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)  # one own group, not member
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)  # two own groups, not member
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)  # no own groups, member in one group
+        cls.u4 = TrUser(login="44444", type="phone", auth_code="4444", authenticated=True)  # no own groups, member in two groups
+        cls.u5 = TrUser(login="55555", type="phone", auth_code="5555", authenticated=True)  # one own group, member in one group
+        cls.u6 = TrUser(login="66666", type="phone", auth_code="6666", authenticated=True)  # two own groups, member in two groups
+        u_list = [cls.u1, cls.u2, cls.u3, cls.u4, cls.u5, cls.u6]
+        cls.user_count = len(u_list)
+        session.add_all(u_list)
+        session.flush()
+        session.refresh(cls.u1)
+        session.refresh(cls.u2)
+        session.refresh(cls.u3)
+        session.refresh(cls.u4)
+        session.refresh(cls.u5)
+        session.refresh(cls.u6)
+        session.commit()
+
+        cls.g1 = TrGroup(user_id=cls.u1.id, title="g1")
+        cls.g2 = TrGroup(user_id=cls.u2.id, title="g2.1")
+        cls.g3 = TrGroup(user_id=cls.u2.id, title="g2.2")
+        g_list = [cls.g1, cls.g2, cls.g3]
+        cls.group_count = len(g_list)
+        session.add_all(g_list)
+        session.commit()
+
+        # Add users to groups
+        cls.g2.users.append(cls.u1)
+        session.add_all([cls.g2])
+        session.commit()
+
+        session.close()
+        
+        # TODO: Add tests for comments
+
+    @classmethod
+    def tearDownClass(cls):
+
+        session = Session()
+
+        users = session.query(TrUser).all()
+        map(session.delete, users)
+
+        groups = session.query(TrGroup).all()
+        map(session.delete, groups)
+
+        session.commit()
+
+        session.close()
+
+    
+
 def suite():
 
     loader = unittest.TestLoader()
@@ -438,8 +556,9 @@ def suite():
     suite.addTests(loader.loadTestsFromTestCase(GroupGetTestCase))
     suite.addTests(loader.loadTestsFromTestCase(GroupAddTestCase))
     suite.addTests(loader.loadTestsFromTestCase(GroupDeleteTestCase))
-    # suite.addTests(loader.loadTestsFromTestCase(DeviceUpdateTestCase))
     suite.addTests(loader.loadTestsFromTestCase(GroupGetGroupMembersTestCase))
+    suite.addTests(loader.loadTestsFromTestCase(CommentAddTestCase))
+    suite.addTests(loader.loadTestsFromTestCase(CommentDeleteTestCase))
 
     return suite
 
