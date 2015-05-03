@@ -34,6 +34,15 @@ def fillGroupResponse(g, admin=False):
 
     return ret
 
+def fillMeetingResponse(m):
+
+    ret = {
+        "id": m.id,
+        "title": m.title,
+        "time": m.time
+    }
+
+    return ret
 
 @jsonrpc.method('getGroups(user_id=Number) -> Any', validate=True, authenticated=False)
 @login_required
