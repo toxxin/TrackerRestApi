@@ -555,7 +555,125 @@ class CommentDeleteTestCase(BaseTestCase):
 
         session.close()
 
-    
+
+class GroupMeetingsGetTestCase(BaseTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+
+        """
+        u1 - g1 - m1
+        u2 - g2 - m2,m3
+        u3 - g3 - x
+        u4 -> g1, g2, g3
+        """
+        session = Session()
+
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
+        cls.u4 = TrUser(login="44444", type="phone", auth_code="4444", authenticated=True)
+        u_list = [cls.u1, cls.u2, cls.u3, cls.u4]
+        cls.user_count = len(u_list)
+        session.add_all(u_list)
+        session.flush()
+        session.refresh(cls.u1)
+        session.refresh(cls.u2)
+        session.refresh(cls.u3)
+        session.refresh(cls.u4)
+        session.commit()
+
+        cls.g1 = TrGroup(user_id=cls.u1.id, title="g1")
+        cls.g2 = TrGroup(user_id=cls.u2.id, title="g2")
+        cls.g3 = TrGroup(user_id=cls.u3.id, title="g3")
+        g_list = [cls.g1, cls.g2, cls.g3]
+        cls.group_count = len(g_list)
+        session.add_all(g_list)
+        session.commit()
+
+        # Add users to groups
+        cls.g1.users.append(cls.u4)
+        cls.g2.users.append(cls.u4)
+        cls.g3.users.append(cls.u4)
+        session.add_all([cls.g1, cls.g2, cls.g3])
+        session.commit()
+
+        # Add meetings to groups
+        cls.m1 = TrGroupMeeting(group_id=cls.g1.id, title="m1", time="2010-12-12 12:12:12")
+        cls.m2 = TrGroupMeeting(group_id=cls.g2.id, title="m2", time="2011-12-12 12:12:12")
+        cls.m3 = TrGroupMeeting(group_id=cls.g2.id, title="m3", time="2012-12-12 12:12:12")
+        session.add_all([cls.m1, cls.m2, cls.m3])
+        session.commit()
+
+        session.close()
+
+    @classmethod
+    def tearDownClass(cls):
+
+        session = Session()
+
+        users = session.query(TrUser).all()
+        map(session.delete, users)
+
+        groups = session.query(TrGroup).all()
+        map(session.delete, groups)
+
+        session.commit()
+
+        session.close()
+
+
+    def test_get_u1_g1_m1(self):
+
+        self.session.add(self.u1)
+
+        data = server.getGroups(self.u1.id)
+
+        self.assertJsonRpc(data)
+        self.assertIn(u'result', data)
+        self.assertEquals(len(data['result']), 1)
+        self.assertEquals(data['result'][0]['title'], "g1")
+        self.assertEquals(data['result'][0]['admin'], True)
+        self.assertEquals(len(data['result'][0]['meetings']), 1)
+        self.assertEquals(data['result'][0]['meetings'][0]['title'], u'm1')
+
+    def test_get_u2_g2_m23(self):
+
+        self.session.add(self.u2)
+
+        data = server.getGroups(self.u2.id)
+
+        self.assertJsonRpc(data)
+        self.assertIn(u'result', data)
+        self.assertEquals(len(data['result']), 1)
+        self.assertEquals(data['result'][0]['title'], "g2")
+        self.assertEquals(data['result'][0]['admin'], True)
+        self.assertEquals(len(data['result'][0]['meetings']), 2)
+        self.assertEquals(data['result'][0]['meetings'][0]['title'], u'm2')
+        self.assertEquals(data['result'][0]['meetings'][1]['title'], u'm3')
+
+    def test_get_u4_g123_mX(self):
+
+        self.session.add(self.u4)
+
+        data = server.getGroups(self.u4.id)
+
+        self.assertJsonRpc(data)
+        self.assertIn(u'result', data)
+        self.assertEquals(len(data['result']), 3)
+        self.assertEquals(data['result'][0]['title'], "g1")
+        self.assertEquals(data['result'][1]['title'], "g2")
+        self.assertEquals(data['result'][2]['title'], "g3")
+        self.assertEquals(data['result'][0]['admin'], False)
+        self.assertEquals(data['result'][1]['admin'], False)
+        self.assertEquals(data['result'][2]['admin'], False)
+        self.assertEquals(len(data['result'][0]['meetings']), 1)
+        self.assertEquals(len(data['result'][1]['meetings']), 2)
+        self.assertIsNone(data['result'][2]['meetings'])
+        self.assertEquals(data['result'][0]['meetings'][0]['title'], u'm1')
+        self.assertEquals(data['result'][1]['meetings'][0]['title'], u'm2')
+        self.assertEquals(data['result'][1]['meetings'][1]['title'], u'm3')
+ 
 
 def suite():
 
@@ -569,6 +687,7 @@ def suite():
     suite.addTests(loader.loadTestsFromTestCase(GroupGetGroupMembersTestCase))
     suite.addTests(loader.loadTestsFromTestCase(CommentAddTestCase))
     suite.addTests(loader.loadTestsFromTestCase(CommentDeleteTestCase))
+    suite.addTests(loader.loadTestsFromTestCase(GroupMeetingsGetTestCase))
 
     return suite
 
