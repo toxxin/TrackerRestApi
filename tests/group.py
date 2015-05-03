@@ -361,6 +361,16 @@ class GroupDeleteTestCase(BaseTestCase):
         self.assertIsNone(g)
         s.close()
 
+    def test_delete_not_own_group(self):
+
+        self.session.add(self.u3)
+        self.session.add(self.g1)
+
+        data = server.delGroup(self.u3.id, self.g1.id)
+
+        self.assertJsonRpcErr(data)
+        self.assertEquals(data['error'][u'message'], "ServerError: Group doesn't exist.")
+
     def test_delete_incorrect_group(self):
 
         self.session.add(self.u1)
