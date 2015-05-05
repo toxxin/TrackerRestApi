@@ -73,12 +73,16 @@ class TrGroupMeeting(DeclarativeBase):
     #colomn definition
     id = Column(u'id', Integer, primary_key=True)
     title = Column(u'title', UnicodeText, nullable=False)
+    time = Column(u'time', TIMESTAMP(), nullable=False)
+    latitude = Column(u'latitude', DECIMAL(precision=10, scale=8), nullable=False)
+    longitude = Column(u'longitude', DECIMAL(precision=11, scale=8), nullable=False)
     last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
     creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
-    time = Column(u'time', TIMESTAMP(), nullable=False)
     group_id = Column(u'group_id', Integer, ForeignKey('tr_group.id'), nullable=False)
 
-    def __init__(self, title, time, group_id):
+    def __init__(self, title, time, latitude, longitude, group_id):
         self.title = title
+        self.latitude = latitude
+        self.longitude = longitude
         self.time = time
         self.group_id = group_id
