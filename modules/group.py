@@ -29,7 +29,8 @@ def fillGroupResponse(g, admin=False):
         "admin": admin,
         "invitation": g.invitation,
         "meeting": g.meeting,
-        "help": g.help
+        "help": g.help,
+        "meetings": [fillMeetingResponse(m) for m in g.meetings] if g.meetings else None
     }
 
     return ret
