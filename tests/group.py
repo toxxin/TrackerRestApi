@@ -673,7 +673,86 @@ class GroupMeetingsGetTestCase(BaseTestCase):
         self.assertEquals(data['result'][0]['meetings'][0]['title'], u'm1')
         self.assertEquals(data['result'][1]['meetings'][0]['title'], u'm2')
         self.assertEquals(data['result'][1]['meetings'][1]['title'], u'm3')
- 
+
+
+class GroupMeetingAddTestCase(BaseTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+
+        """
+        u1 - g1 - m1
+        u2 - g2 - m2,m3
+        u3 - g3 - x
+        u4 -> g1, g2, g3
+        """
+        session = Session()
+
+        cls.u1 = TrUser(login="11111", type="phone", auth_code="1111", authenticated=True)
+        cls.u2 = TrUser(login="22222", type="phone", auth_code="2222", authenticated=True)
+        cls.u3 = TrUser(login="33333", type="phone", auth_code="3333", authenticated=True)
+        cls.u4 = TrUser(login="44444", type="phone", auth_code="4444", authenticated=True)
+        u_list = [cls.u1, cls.u2, cls.u3, cls.u4]
+        cls.user_count = len(u_list)
+        session.add_all(u_list)
+        session.flush()
+        session.refresh(cls.u1)
+        session.refresh(cls.u2)
+        session.refresh(cls.u3)
+        session.refresh(cls.u4)
+        session.commit()
+
+        cls.g1 = TrGroup(user_id=cls.u1.id, title="g1")
+        cls.g2 = TrGroup(user_id=cls.u2.id, title="g2")
+        cls.g3 = TrGroup(user_id=cls.u3.id, title="g3")
+        g_list = [cls.g1, cls.g2, cls.g3]
+        cls.group_count = len(g_list)
+        session.add_all(g_list)
+        session.commit()
+
+        # Add users to groups
+        cls.g1.users.append(cls.u4)
+        cls.g2.users.append(cls.u4)
+        cls.g3.users.append(cls.u4)
+        session.add_all([cls.g1, cls.g2, cls.g3])
+        session.commit()
+
+        session.close()
+
+    @classmethod
+    def tearDownClass(cls):
+
+        session = Session()
+
+        users = session.query(TrUser).all()
+        map(session.delete, users)
+
+        groups = session.query(TrGroup).all()
+        map(session.delete, groups)
+
+        session.commit()
+
+        session.close()
+
+
+    def test_add_notmal_meeting(self):
+
+        self.session.add(self.u1)
+        self.session.add(self.g1)
+
+        data = server.addGroupMeeting(self.u1.id, self.g1.id, "t1", "54.123,35.333", 123456789)
+
+        self.assertJsonRpc(data)
+        self.assertIn(u'result', data)
+        self.assertIs(type(data['result']), int)
+
+        s = Session()
+        g = s.query(TrGroup).get(self.g1.id)
+        self.assertEquals(len(g.meetings), 1)
+        self.assertEquals(g.meetings[0].id, data['result'])
+        self.assertEquals(g.meetings[0].title, u't1')
+        s.close()
+
 
 def suite():
 
