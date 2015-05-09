@@ -293,3 +293,30 @@ def getGroupMembers(user_id, id):
 
     return lst
 
+
+@jsonrpc.method('addGroupMeeting(user_id=Number,group_id=Number,title=String,lat_log=String,time=Number) -> Object', validate=True, authenticated=False)
+@login_required
+def addGroupMeeting(user_id, group_id, title, lat_log, time):
+
+    session = Session()
+
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    g = session.query(TrGroup).filter(TrGroup.user_id == uid).filter(TrGroup.id == group_id).first()
+    if g is None:
+        session.close()
+        raise ServerError("Group doesn't exist.")
+
+    m = TrGroupMeeting(group_id=group_id, title=title, latitude=0, longitude=0, time=datetime.datetime.fromtimestamp(time))
+
+    try:
+        session.add(m)
+        session.commit()
+        session.refresh(m)
+    except:
+        session.rollback()
+        raise ServerError("Can't add meeting.")
+    finally:
+        session.close()
+
+    return m.id
