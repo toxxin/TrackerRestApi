@@ -320,3 +320,29 @@ def addGroupMeeting(user_id, group_id, title, lat_log, time):
         session.close()
 
     return m.id
+
+
+@jsonrpc.method('delGroupMeeting(user_id=Number,id=Number) -> Object', validate=True, authenticated=False)
+@login_required
+def delGroupMeeting(user_id, id):
+
+    session = Session()
+
+    uid = int(current_user.get_id()) if app.config.get('LOGIN_DISABLED') is False else user_id
+
+    t = session.query(TrGroup).filter(TrGroup.user_id == uid).subquery('t')
+    m = session.query(TrGroupMeeting).filter(TrGroupMeeting.group_id == t.c.id).filter(TrGroupMeeting.id == id).first()
+    if m is None:
+        session.close()
+        raise ServerError("Meeting doesn't exist.")
+
+    try:
+        session.delete(m)
+        session.commit()
+    except:
+        session.rollback()
+        raise ServerError("Can't delete meeting.")
+    finally:
+        session.close()
+
+    return True
