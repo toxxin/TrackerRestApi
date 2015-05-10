@@ -841,6 +841,25 @@ class GroupMeetingDeleteTestCase(BaseTestCase):
         self.assertJsonRpc(data)
         self.assertIs(data['result'], True)
 
+    def test_delete_not_own_meeting(self):
+
+        self.session.add(self.u4)
+
+        data = server.getGroups(self.u4.id)
+
+        self.assertJsonRpc(data)
+        self.assertIn(u'result', data)
+        self.assertEquals(len(data['result']), 3)
+        self.assertEquals(data['result'][0]['title'], "g1")
+        self.assertEquals(data['result'][0]['admin'], False)
+        self.assertEquals(len(data['result'][0]['meetings']), 1)
+        self.assertEquals(data['result'][0]['meetings'][0]['title'], u'm1')
+
+        data = server.delGroupMeeting(self.u4.id, data['result'][0]['meetings'][0]['id'])
+
+        self.assertJsonRpcErr(data)
+        self.assertEquals(data['error'][u'message'], "ServerError: Meeting doesn't exist.")
+
 
 def suite():
 
