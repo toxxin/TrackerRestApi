@@ -11,8 +11,8 @@ from sqlautocode_gen import DeclarativeBase
 
 association_table_user_group = Table('tr_user_group', DeclarativeBase.metadata,
     Column(u'id', Integer, primary_key=True),
-    Column(u'user_id', Integer, ForeignKey('tr_user.id'), nullable=False),
-    Column(u'group_id', Integer, ForeignKey('tr_group.id'), nullable=False)
+    Column(u'user_id', Integer, ForeignKey('tr_user.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False),
+    Column(u'group_id', Integer, ForeignKey('tr_group.id', onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
     )
 
 
