@@ -253,40 +253,29 @@ class GroupAddTestCase(BaseTestCase):
 
         session.close()
 
-    # def test_add_group(self):
-    #
-    #     self.session.add(self.u1)
-    #       #TODO: group added in another session. Error in attempt to delete all users and groups
-    #     data = server.addGroup(self.u1.id, "group", "desc", True, False, False)
-    #
-    #     self.assertJsonRpc(data)
-    #
-    #     s = Session()
-    #     g = s.query(TrGroup).get(data['result'])
-    #     self.assertEquals(g.title, u'group')
-    #     self.assertEquals(g.desc, u'desc')
-    #     s.close()
 
-    # def test_add_group_no_desc(self):
+    def test_add_group(self):
 
-    #     self.session.add(self.u1)
-    #
-    #     data = server.addGroup(self.u1.id, "group", "desc", true, false, false)
-    #
-    #     self.assertJsonRpc(data)
-    #     self.assertIs(type(data['result'], True)
+        self.session.add(self.u1)
+        data = server.addGroup(self.u1.id, "group", "desc", True, False, False)
 
+        self.assertJsonRpc(data)
+        self.assertIs(type(data['result']), int)
 
-    # @unittest.skip("Add new group.")
-    # def test_relations(self):
-    #
-    #     # TODO: Add some code
-    #
-    #     data = server.getDevices(self.u1.id)
-    #
-    #     self.assertIn(u'result', data)
-    #     self.assertEquals(len(data['result']), 1)
-    #     self.assertEquals(data['result'][0]['sn'], 'EW-14100001-UT')
+        s = Session()
+        g = s.query(TrGroup).get(data['result'])
+        self.assertEquals(g.title, u'group')
+        self.assertEquals(g.desc, u'desc')
+        s.close()
+
+    def test_add_group_no_desc(self):
+
+        self.session.add(self.u1)
+
+        data = server.addGroup(self.u1.id, "group", "desc", True, False, False)
+
+        self.assertJsonRpc(data)
+        self.assertIs(type(data['result']), int)
 
 
 class GroupDeleteTestCase(BaseTestCase):
