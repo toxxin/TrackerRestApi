@@ -158,8 +158,8 @@ def fillUser(u):
         "id": u.id,
         "login": u.login,
         "pic": app.config.get('PROFILE_IMG_URL') + u.pic if u.pic is not None else u.pic,
-        "location": str(u.loc.latitude) + ',' + str(u.loc.longitude) if u.loc.latitude is not None and u.loc.longitude is not None else None,
-        "timestamp": calendar.timegm(u.loc.creation_date.utctimetuple())
+        "location": str(u.locations[0].latitude) + ',' + str(u.locations[0].longitude) if u.locations[0].latitude is not None and u.locations[0].longitude is not None else None,
+        "timestamp": calendar.timegm(u.locations[0].creation_date.utctimetuple())
     }
 
     return ret
