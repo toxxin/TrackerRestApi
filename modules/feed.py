@@ -29,9 +29,9 @@ def fillFeedResponse(feed, sub):
     return ret
 
 
-@jsonrpc.method('s_getFeeds(user_id=Number) -> Any', validate=True, authenticated=False)
+@jsonrpc.method('getFeeds(user_id=Number) -> Any', validate=True, authenticated=False)
 @login_required
-def s_getFeeds(user_id):
+def getFeeds(user_id):
 
     session = Session()
 
@@ -52,9 +52,9 @@ def s_getFeeds(user_id):
     return lst
 
 
-@jsonrpc.method('s_subFeed(user_id=Number, feed_id=Number) -> Object', validate=True, authenticated=False)
+@jsonrpc.method('subFeed(user_id=Number, feed_id=Number) -> Object', validate=True, authenticated=False)
 @login_required
-def s_subFeed(user_id, feed_id):
+def subFeed(user_id, feed_id):
 
     session = Session()
 
@@ -78,9 +78,9 @@ def s_subFeed(user_id, feed_id):
     return True
 
 
-@jsonrpc.method('s_unsubFeed(user_id=Number, feed_id=Number) -> Object', validate=True, authenticated=False)
+@jsonrpc.method('unsubFeed(user_id=Number, feed_id=Number) -> Object', validate=True, authenticated=False)
 @login_required
-def s_unsubFeed(user_id, feed_id):
+def unsubFeed(user_id, feed_id):
 
     session = Session()
 
@@ -102,7 +102,7 @@ def s_unsubFeed(user_id, feed_id):
     return True
 
 
-def s_fillFeedResponse(f, fav):
+def fillFeedResponse(f, fav):
 
     ret = {
         "id": f.id,
@@ -118,9 +118,9 @@ def s_fillFeedResponse(f, fav):
 
     return ret
 
-@jsonrpc.method('s_getFeedNews(user_id=Number, since=Number) -> Object', validate=True, authenticated=False)
+@jsonrpc.method('getFeedNews(user_id=Number, since=Number) -> Object', validate=True, authenticated=False)
 @login_required
-def s_getFeedNews(user_id, since):
+def getFeedNews(user_id, since):
 
     session = Session()
 
@@ -130,16 +130,16 @@ def s_getFeedNews(user_id, since):
     fs = session.query(TrFeedNews, TrUserFeedFav.id).outerjoin(TrUserFeedFav).filter(TrFeedNews.feed_id == t.c.feed_id).\
                         filter(TrFeedNews.published > datetime.datetime.fromtimestamp(since)).all()
 
-    lst = [s_fillFeedResponse(f[0], f[1] is not None) for f in fs]
+    lst = [fillFeedResponse(f[0], f[1] is not None) for f in fs]
 
-    lst = [s_fillFeedResponse(f) for f in fs]
+    lst = [fillFeedResponse(f) for f in fs]
 
     session.close()
 
     return lst
 
-@jsonrpc.method('s_addFavFeed(user_id=Number, feed_id=Number, id=Number) -> Object', validate=True, authenticated=False)
-def s_addFavFeed(user_id, feed_id, id):
+@jsonrpc.method('addFavFeed(user_id=Number, feed_id=Number, id=Number) -> Object', validate=True, authenticated=False)
+def addFavFeed(user_id, feed_id, id):
 
     session = Session()
 
@@ -169,8 +169,8 @@ def s_addFavFeed(user_id, feed_id, id):
     return True
 
 
-@jsonrpc.method('s_delFavFeed(user_id=Number, feed_id=Number, id=Number) -> Object', validate=True, authenticated=False)
-def s_delFavFeed(user_id, feed_id, id):
+@jsonrpc.method('delFavFeed(user_id=Number, feed_id=Number, id=Number) -> Object', validate=True, authenticated=False)
+def delFavFeed(user_id, feed_id, id):
 
     session = Session()
 
@@ -199,8 +199,8 @@ def s_delFavFeed(user_id, feed_id, id):
     return True
 
 
-@jsonrpc.method('s_getFavsFeed(user_id=Number, feed_id=Number) -> Object', validate=True, authenticated=False)
-def s_getFavsFeed(user_id, feed_id):
+@jsonrpc.method('getFavsFeed(user_id=Number, feed_id=Number) -> Object', validate=True, authenticated=False)
+def getFavsFeed(user_id, feed_id):
 
     session = Session()
 
