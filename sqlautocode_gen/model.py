@@ -150,65 +150,6 @@ class TrDevice(DeclarativeBase):
         self.vehicle_id = vehicle_id
 
 
-'''Shape params:    0: circle, 1: square, 2: random'''
-class TrDGeozone(DeclarativeBase):
-    __tablename__ = 'tr_dgeozone'
-
-    __table_args__ = {'mysql_engine': 'InnoDB'}
-
-    #column definitions
-    id = Column(u'id', Integer, primary_key=True)
-    name = Column(u'name', String(20), nullable=False)
-    state = Column(u'state', Boolean, nullable=False)
-    shape = Column(u'shape', SmallInteger, nullable=False)
-    center = Column(u'center', String(20), nullable=False)
-    radius = Column(u'radius', Integer, nullable=False)
-    color = Column(u'color', String(7), nullable=False)
-    last_modified = Column(u'last_modified', TIMESTAMP(), nullable=False, onupdate=func.now())
-    creation_date = Column(u'creation_date', TIMESTAMP(), nullable=False, default=func.now())
-    device_id = Column(u'device_id', Integer, ForeignKey('tr_device.id'), nullable=False)
-
-    def __init__(self, name, device_id, state=True, shape=0, center="55.7500,37.6167", radius=100, color="#00ff00"):
-        self.name = name
-        self.state = state
-        self.shape = shape
-        self.center = center
-        self.radius = radius
-        self.color = color
-        self.device_id = device_id
-
-    def __repr__(self):
-        return "<FGeo(id='%d', name='%s', shape='%d', center='%s', radius='%d', color='%s')>" % \
-                                        (self.id, self.name, self.shape, self.center, self.radius, self.color)
-
-
-class TrDLocation(DeclarativeBase):
-    __tablename__ = 'tr_dlocation'
-
-    __table_args__ = {'mysql_engine': 'InnoDB'}
-
-    #column definitions
-    id = Column(u'id', Integer, primary_key=True)
-    lat_log = Column(u'lat_log', String(20), nullable=False)
-    altitude = Column(u'altitude', String(20))
-    accuracy = Column(u'accuracy', Integer)
-    speed = Column(u'speed', SmallInteger)
-    creation_date = Column(u'creation_date', TIMESTAMP, nullable=False, default=datetime.datetime.utcnow)
-    device_id = Column(u'device_id', Integer, ForeignKey('tr_device.id'), nullable=False)
-
-    def __init__(self, lat_log, creation_date, device_id, altitude=null, accuracy=null, speed=null):
-        self.lat_log = lat_log
-        self.altitude = altitude
-        self.accuracy = accuracy
-        self.speed = speed
-        self.creation_date = creation_date
-        self.device_id = device_id
-
-    def __repr__(self):
-        return "<DLocation(id='%d', lat_log='%s', altitude='%d', accuracy='%d', speed='%d', creation_date='%s', device_id='%d')>" % \
-                                        (self.id, self.lat_log, self.altitude, self.accuracy, self.speed, self.creation_date, self.device_id)
-
-
 class TrPushToken(DeclarativeBase):
     __tablename__ = 'tr_ptoken'
 
